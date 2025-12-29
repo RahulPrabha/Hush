@@ -72,6 +72,47 @@ class BiquadFilter {
     }
 }
 
+// Biquad bandpass filter for speech blocker
+class BandPassFilter {
+    private var b0: Float = 0, b1: Float = 0, b2: Float = 0
+    private var a1: Float = 0, a2: Float = 0
+    private var x1: Float = 0, x2: Float = 0
+    private var y1: Float = 0, y2: Float = 0
+    private var sampleRate: Float
+
+    init(center: Float, q: Float = 1.0, sampleRate: Float = 44100) {
+        self.sampleRate = sampleRate
+        setCenter(center, q: q)
+    }
+
+    func setCenter(_ center: Float, q: Float = 1.0) {
+        let omega = 2.0 * Float.pi * center / sampleRate
+        let sinOmega = sin(omega)
+        let cosOmega = cos(omega)
+        let alpha = sinOmega / (2.0 * q)
+
+        let a0 = 1.0 + alpha
+        b0 = alpha / a0
+        b1 = 0.0
+        b2 = -alpha / a0
+        a1 = (-2.0 * cosOmega) / a0
+        a2 = (1.0 - alpha) / a0
+    }
+
+    func process(_ input: Float) -> Float {
+        let output = b0 * input + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2 = x1
+        x1 = input
+        y2 = y1
+        y1 = output
+        return output
+    }
+
+    func reset() {
+        x1 = 0; x2 = 0; y1 = 0; y2 = 0
+    }
+}
+
 // Biquad low-pass filter for brown noise
 class LowPassFilter {
     private var b0: Float = 0, b1: Float = 0, b2: Float = 0
@@ -133,8 +174,22 @@ class NoiseGenerator {
         }
     }
 
+    // Bandpass filter for speech blocker
+    private var speechBandPass: BandPassFilter
+    var speechCenter: Float = 200 {
+        didSet {
+            speechBandPass.setCenter(speechCenter, q: speechQ)
+        }
+    }
+    var speechQ: Float = 1.82 {
+        didSet {
+            speechBandPass.setCenter(speechCenter, q: speechQ)
+        }
+    }
+
     init() {
         brownLowPass = LowPassFilter(cutoff: 200, sampleRate: sampleRate)
+        speechBandPass = BandPassFilter(center: 200, q: 1.82, sampleRate: sampleRate)
         setupFilters()
     }
 
@@ -153,6 +208,7 @@ class NoiseGenerator {
         brownState = 0
         bandFilters.forEach { $0.reset() }
         brownLowPass.reset()
+        speechBandPass.reset()
     }
 
     func generateSample(type: NoiseType, useCustomLevels: Bool = false) -> Float {
@@ -164,11 +220,18 @@ class NoiseGenerator {
         case .brown:
             return generateBrownNoise()
         case .speechBlocker:
-            if let levels = type.eqLevels {
-                return generateEqualizedNoise(levels: levels)
-            }
-            return generateWhiteNoise()
+            return generateSpeechBlocker()
         }
+    }
+
+    // Speech blocker: pink noise shaped by 10-band EQ matching myNoise curve
+    // Uses pink noise base for softer, less harsh sound
+    private func generateSpeechBlocker() -> Float {
+        // EQ levels from myNoise Speech Blocker preset (converted from dBFS to linear)
+        // Frequencies: 20Hz, 60Hz, 125Hz, 250Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 17kHz
+        // dBFS:        -43   -32   -25    -16    -13    -15   -25   -33   -45   -70
+        let speechLevels: [Float] = [0.007, 0.025, 0.056, 0.158, 0.224, 0.178, 0.056, 0.022, 0.006, 0.0003]
+        return generateEqualizedNoise(levels: speechLevels, usePinkBase: true) * 4.0
     }
 
     // Brown noise: integrated white noise with low-pass filter
@@ -183,13 +246,13 @@ class NoiseGenerator {
         return filtered * 2.5
     }
 
-    // Generate noise shaped by 10-band EQ
-    private func generateEqualizedNoise(levels: [Float]) -> Float {
-        let white = Float.random(in: -1...1)
+    // Generate noise shaped by 10-band EQ (uses pink noise base for softer sound)
+    private func generateEqualizedNoise(levels: [Float], usePinkBase: Bool = false) -> Float {
+        let source = usePinkBase ? generatePinkNoise() : Float.random(in: -1...1)
 
         var output: Float = 0
         for (i, filter) in bandFilters.enumerated() {
-            let filtered = filter.process(white)
+            let filtered = filter.process(source)
             output += filtered * levels[i]
         }
 

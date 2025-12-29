@@ -30,6 +30,18 @@ class AudioEngine: ObservableObject {
         }
     }
 
+    // Speech blocker center frequency and Q
+    @Published var speechCenter: Float = 200 {
+        didSet {
+            noiseGenerator.speechCenter = speechCenter
+        }
+    }
+    @Published var speechQ: Float = 1.82 {
+        didSet {
+            noiseGenerator.speechQ = speechQ
+        }
+    }
+
     private var audioEngine: AVAudioEngine?
     private var sourceNode: AVAudioSourceNode?
     let noiseGenerator = NoiseGenerator()

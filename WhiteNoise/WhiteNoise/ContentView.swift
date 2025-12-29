@@ -81,6 +81,7 @@ struct ContentView: View {
                 Divider()
             }
 
+
             // Volume Control
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
