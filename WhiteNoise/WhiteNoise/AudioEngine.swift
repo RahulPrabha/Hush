@@ -15,9 +15,26 @@ class AudioEngine: ObservableObject {
         }
     }
 
+    // Custom EQ controls
+    @Published var useCustomEQ = true
+    @Published var eqLevels: [Float] = [0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15] {
+        didSet {
+            noiseGenerator.customLevels = eqLevels
+        }
+    }
+
+    // Brown noise cutoff frequency (Hz)
+    @Published var brownCutoff: Float = 200 {
+        didSet {
+            noiseGenerator.brownCutoff = brownCutoff
+        }
+    }
+
     private var audioEngine: AVAudioEngine?
     private var sourceNode: AVAudioSourceNode?
-    private let noiseGenerator = NoiseGenerator()
+    let noiseGenerator = NoiseGenerator()
+
+    var frequencies: [Float] { noiseGenerator.frequencies }
 
     private let sampleRate: Double = 44100
     private var fadeLevel: Float = 0
@@ -59,7 +76,7 @@ class AudioEngine: ObservableObject {
                         self.fadeLevel = max(0, self.fadeLevel - self.fadeSpeed)
                     }
 
-                    let sample = self.noiseGenerator.generateSample(type: self.noiseType)
+                    let sample = self.noiseGenerator.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
                     let adjustedSample = sample * self.volume * self.fadeLevel
 
                     for buffer in ablPointer {

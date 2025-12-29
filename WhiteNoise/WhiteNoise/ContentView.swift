@@ -1,5 +1,12 @@
 import SwiftUI
 
+func formatFreq(_ freq: Float) -> String {
+    if freq >= 1000 {
+        return String(format: "%.0fk", freq / 1000)
+    }
+    return String(format: "%.0f", freq)
+}
+
 struct ContentView: View {
     @ObservedObject var audioEngine: AudioEngine
     @AppStorage("selectedNoiseType") private var selectedNoiseType = "White"
@@ -40,6 +47,39 @@ struct ContentView: View {
             }
 
             Divider()
+
+            // Cutoff control for Brown noise
+            if audioEngine.noiseType == .brown {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Low-Pass Cutoff")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(Int(audioEngine.brownCutoff)) Hz")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .monospacedDigit()
+                    }
+
+                    HStack(spacing: 8) {
+                        Text("20")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+
+                        Slider(value: Binding(
+                            get: { Double(audioEngine.brownCutoff) },
+                            set: { audioEngine.brownCutoff = Float($0) }
+                        ), in: 20...500)
+
+                        Text("500")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Divider()
+            }
 
             // Volume Control
             VStack(alignment: .leading, spacing: 8) {
@@ -105,7 +145,7 @@ struct ContentView: View {
             .keyboardShortcut("q", modifiers: .command)
         }
         .padding()
-        .frame(width: 280)
+        .frame(width: 320)
         .onAppear {
             // Restore saved preferences
             if let type = NoiseType(rawValue: selectedNoiseType) {

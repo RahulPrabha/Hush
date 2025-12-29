@@ -23,7 +23,8 @@ enum NoiseType: String, CaseIterable, Identifiable {
     var eqLevels: [Float]? {
         switch self {
         case .brown:
-            return [0.50, 0.46, 0.42, 0.38, 0.34, 0.30, 0.27, 0.24, 0.21, 0.18]
+            // Exact values from browser
+            return [0.614, 0.564, 0.515, 0.466, 0.417, 0.368, 0.331, 0.294, 0.258, 0.221]
         case .speechBlocker:
             return [0.14, 0.22, 0.28, 0.40, 0.46, 0.42, 0.28, 0.21, 0.13, 0.05]
         default:
@@ -71,23 +72,76 @@ class BiquadFilter {
     }
 }
 
+// Biquad low-pass filter for brown noise
+class LowPassFilter {
+    private var b0: Float = 0, b1: Float = 0, b2: Float = 0
+    private var a1: Float = 0, a2: Float = 0
+    private var x1: Float = 0, x2: Float = 0
+    private var y1: Float = 0, y2: Float = 0
+    private var sampleRate: Float
+
+    init(cutoff: Float, q: Float = 0.707, sampleRate: Float = 44100) {
+        self.sampleRate = sampleRate
+        setCutoff(cutoff, q: q)
+    }
+
+    func setCutoff(_ cutoff: Float, q: Float = 0.707) {
+        let omega = 2.0 * Float.pi * cutoff / sampleRate
+        let sinOmega = sin(omega)
+        let cosOmega = cos(omega)
+        let alpha = sinOmega / (2.0 * q)
+
+        let a0 = 1.0 + alpha
+        b0 = ((1.0 - cosOmega) / 2.0) / a0
+        b1 = (1.0 - cosOmega) / a0
+        b2 = ((1.0 - cosOmega) / 2.0) / a0
+        a1 = (-2.0 * cosOmega) / a0
+        a2 = (1.0 - alpha) / a0
+    }
+
+    func process(_ input: Float) -> Float {
+        let output = b0 * input + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2 = x1
+        x1 = input
+        y2 = y1
+        y1 = output
+        return output
+    }
+
+    func reset() {
+        x1 = 0; x2 = 0; y1 = 0; y2 = 0
+    }
+}
+
 class NoiseGenerator {
     private var pinkState: [Float] = [0, 0, 0, 0, 0, 0, 0]
     private var brownState: Float = 0
 
     // 10-band equalizer filters
     private var bandFilters: [BiquadFilter] = []
-    private let frequencies: [Float] = [20, 60, 125, 250, 500, 1000, 2000, 4000, 8000, 17000]
+    let frequencies: [Float] = [20, 60, 125, 250, 500, 1000, 2000, 4000, 8000, 17000]
     private let sampleRate: Float = 44100
 
+    // Custom EQ levels for tuning
+    var customLevels: [Float] = [0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15]
+
+    // Low-pass filter for brown noise
+    private var brownLowPass: LowPassFilter
+    var brownCutoff: Float = 200 {
+        didSet {
+            brownLowPass.setCutoff(brownCutoff)
+        }
+    }
+
     init() {
+        brownLowPass = LowPassFilter(cutoff: 200, sampleRate: sampleRate)
         setupFilters()
     }
 
     private func setupFilters() {
-        // Q factor for bandpass - higher Q = narrower band
-        // Using moderate Q for smooth overlap between bands
-        let qFactors: [Float] = [1.0, 1.2, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.2, 1.0]
+        // Q factor for bandpass - lower Q = wider band
+        // Use wide bands for smooth, full-spectrum coverage
+        let qFactors: [Float] = [0.5, 0.6, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.6, 0.5]
 
         bandFilters = zip(frequencies, qFactors).map { freq, q in
             BiquadFilter(frequency: freq, q: q, sampleRate: sampleRate)
@@ -98,21 +152,35 @@ class NoiseGenerator {
         pinkState = [0, 0, 0, 0, 0, 0, 0]
         brownState = 0
         bandFilters.forEach { $0.reset() }
+        brownLowPass.reset()
     }
 
-    func generateSample(type: NoiseType) -> Float {
-        if let levels = type.eqLevels {
-            return generateEqualizedNoise(levels: levels)
-        }
-
+    func generateSample(type: NoiseType, useCustomLevels: Bool = false) -> Float {
         switch type {
         case .white:
             return generateWhiteNoise()
         case .pink:
             return generatePinkNoise()
-        default:
+        case .brown:
+            return generateBrownNoise()
+        case .speechBlocker:
+            if let levels = type.eqLevels {
+                return generateEqualizedNoise(levels: levels)
+            }
             return generateWhiteNoise()
         }
+    }
+
+    // Brown noise: integrated white noise with low-pass filter
+    private func generateBrownNoise() -> Float {
+        let white = Float.random(in: -1...1)
+        // Integrate white noise (random walk)
+        brownState = brownState + (0.02 * white)
+        // Leaky integrator to prevent DC drift
+        brownState = brownState * 0.998
+        // Apply low-pass filter to cut highs
+        let filtered = brownLowPass.process(brownState)
+        return filtered * 2.5
     }
 
     // Generate noise shaped by 10-band EQ
