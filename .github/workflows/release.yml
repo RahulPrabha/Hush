@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build app
+        run: |
+          xcodebuild -project WhiteNoise/WhiteNoise.xcodeproj \
+            -scheme WhiteNoise \
+            -configuration Release \
+            -derivedDataPath .build \
+            -arch arm64 -arch x86_64 \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package app
+        run: |
+          mkdir -p dist
+          cp -R .build/Build/Products/Release/WhiteNoise.app dist/
+          cd dist && zip -r WhiteNoise.zip WhiteNoise.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhiteNoise
+          path: dist/WhiteNoise.zip
+
+      - name: Create nightly release
+        if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Nightly Build
+          tag_name: nightly
+          prerelease: true
+          files: dist/WhiteNoise.zip
+          body: |
+            Automated nightly build from main branch.
+
+            Commit: ${{ github.sha }}
+
+      - name: Create tagged release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/WhiteNoise.zip
+          generate_release_notes: true
