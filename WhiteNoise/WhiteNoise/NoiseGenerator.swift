@@ -168,7 +168,7 @@ class NoiseGenerator {
 
     // Low-pass filter for brown noise
     private var brownLowPass: LowPassFilter
-    var brownCutoff: Float = 200 {
+    var brownCutoff: Float = 500 {
         didSet {
             brownLowPass.setCutoff(brownCutoff)
         }
@@ -188,15 +188,15 @@ class NoiseGenerator {
     }
 
     init() {
-        brownLowPass = LowPassFilter(cutoff: 200, sampleRate: sampleRate)
+        brownLowPass = LowPassFilter(cutoff: 500, sampleRate: sampleRate)
         speechBandPass = BandPassFilter(center: 200, q: 1.82, sampleRate: sampleRate)
         setupFilters()
     }
 
     private func setupFilters() {
         // Q factor for bandpass - lower Q = wider band
-        // Use wide bands for smooth, full-spectrum coverage
-        let qFactors: [Float] = [0.5, 0.6, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.6, 0.5]
+        // Very wide bands for smooth, flat coverage
+        let qFactors: [Float] = [0.3, 0.3, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.3, 0.3]
 
         bandFilters = zip(frequencies, qFactors).map { freq, q in
             BiquadFilter(frequency: freq, q: q, sampleRate: sampleRate)
@@ -224,14 +224,13 @@ class NoiseGenerator {
         }
     }
 
-    // Speech blocker: pink noise shaped by 10-band EQ matching myNoise curve
-    // Uses pink noise base for softer, less harsh sound
+    // Speech blocker: pink noise shaped by 10-band EQ
+    // Uses pink noise base for softer sound
     private func generateSpeechBlocker() -> Float {
-        // EQ levels from myNoise Speech Blocker preset (converted from dBFS to linear)
+        // Flattened EQ curve - boost outer bands for wider, fuller sound
         // Frequencies: 20Hz, 60Hz, 125Hz, 250Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 17kHz
-        // dBFS:        -43   -32   -25    -16    -13    -15   -25   -33   -45   -70
-        let speechLevels: [Float] = [0.007, 0.025, 0.056, 0.158, 0.224, 0.178, 0.056, 0.022, 0.006, 0.0003]
-        return generateEqualizedNoise(levels: speechLevels, usePinkBase: true) * 4.0
+        let speechLevels: [Float] = [0.08, 0.12, 0.16, 0.20, 0.22, 0.20, 0.16, 0.12, 0.08, 0.04]
+        return generateEqualizedNoise(levels: speechLevels, usePinkBase: true) * 3.0
     }
 
     // Brown noise: integrated white noise with low-pass filter
@@ -246,13 +245,22 @@ class NoiseGenerator {
         return filtered * 2.5
     }
 
-    // Generate noise shaped by 10-band EQ (uses pink noise base for softer sound)
-    private func generateEqualizedNoise(levels: [Float], usePinkBase: Bool = false) -> Float {
-        let source = usePinkBase ? generatePinkNoise() : Float.random(in: -1...1)
+    // Generate noise shaped by 10-band EQ
+    private func generateEqualizedNoise(levels: [Float], usePinkBase: Bool = false, useBrownBase: Bool = false, source: Float? = nil) -> Float {
+        let noiseSource: Float
+        if let source = source {
+            noiseSource = source
+        } else if useBrownBase {
+            noiseSource = generateBrownNoise()
+        } else if usePinkBase {
+            noiseSource = generatePinkNoise()
+        } else {
+            noiseSource = Float.random(in: -1...1)
+        }
 
         var output: Float = 0
         for (i, filter) in bandFilters.enumerated() {
-            let filtered = filter.process(source)
+            let filtered = filter.process(noiseSource)
             output += filtered * levels[i]
         }
 

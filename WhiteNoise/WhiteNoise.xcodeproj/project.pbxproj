@@ -11,7 +11,6 @@
 		AAA00002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00011 /* ContentView.swift */; };
 		AAA00003 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00012 /* AudioEngine.swift */; };
 		AAA00004 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013 /* NoiseGenerator.swift */; };
-		AAA00005 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00014 /* HotkeyManager.swift */; };
 		AAA00006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAA00015 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -20,7 +19,6 @@
 		AAA00011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AAA00012 /* AudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngine.swift; sourceTree = "<group>"; };
 		AAA00013 /* NoiseGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseGenerator.swift; sourceTree = "<group>"; };
-		AAA00014 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		AAA00015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAA00020 /* WhiteNoise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhiteNoise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -51,7 +49,6 @@
 				AAA00011 /* ContentView.swift */,
 				AAA00012 /* AudioEngine.swift */,
 				AAA00013 /* NoiseGenerator.swift */,
-				AAA00014 /* HotkeyManager.swift */,
 				AAA00015 /* Assets.xcassets */,
 			);
 			path = WhiteNoise;
@@ -138,7 +135,6 @@
 				AAA00002 /* ContentView.swift in Sources */,
 				AAA00003 /* AudioEngine.swift in Sources */,
 				AAA00004 /* NoiseGenerator.swift in Sources */,
-				AAA00005 /* HotkeyManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

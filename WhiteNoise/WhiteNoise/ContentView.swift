@@ -22,6 +22,7 @@ struct ContentView: View {
                 Text(audioEngine.isPlaying ? "Playing" : "Stopped")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .frame(width: 50, alignment: .trailing)
             }
 
             Divider()
@@ -117,23 +118,22 @@ struct ContentView: View {
             Button(action: { audioEngine.toggle() }) {
                 HStack {
                     Image(systemName: audioEngine.isPlaying ? "pause.fill" : "play.fill")
+                        .frame(width: 14)
                     Text(audioEngine.isPlaying ? "Pause" : "Play")
+                        .frame(width: 45)
                 }
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .keyboardShortcut(.space, modifiers: [])
 
-            // Keyboard Shortcut Info
+            // Tip
             HStack {
-                Image(systemName: "keyboard")
+                Image(systemName: "computermouse")
                     .foregroundColor(.secondary)
-                Text("Global shortcut:")
+                Text("Right-click icon to toggle sound")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                Text("Cmd + Shift + W")
-                    .font(.caption)
-                    .fontWeight(.medium)
                 Spacer()
             }
 

@@ -11,7 +11,8 @@ class AudioEngine: ObservableObject {
     }
     @Published var noiseType: NoiseType = .white {
         didSet {
-            noiseGenerator.reset()
+            noiseGeneratorL.reset()
+            noiseGeneratorR.reset()
         }
     }
 
@@ -19,34 +20,39 @@ class AudioEngine: ObservableObject {
     @Published var useCustomEQ = true
     @Published var eqLevels: [Float] = [0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15] {
         didSet {
-            noiseGenerator.customLevels = eqLevels
+            noiseGeneratorL.customLevels = eqLevels
+            noiseGeneratorR.customLevels = eqLevels
         }
     }
 
     // Brown noise cutoff frequency (Hz)
-    @Published var brownCutoff: Float = 200 {
+    @Published var brownCutoff: Float = 500 {
         didSet {
-            noiseGenerator.brownCutoff = brownCutoff
+            noiseGeneratorL.brownCutoff = brownCutoff
+            noiseGeneratorR.brownCutoff = brownCutoff
         }
     }
 
     // Speech blocker center frequency and Q
     @Published var speechCenter: Float = 200 {
         didSet {
-            noiseGenerator.speechCenter = speechCenter
+            noiseGeneratorL.speechCenter = speechCenter
+            noiseGeneratorR.speechCenter = speechCenter
         }
     }
     @Published var speechQ: Float = 1.82 {
         didSet {
-            noiseGenerator.speechQ = speechQ
+            noiseGeneratorL.speechQ = speechQ
+            noiseGeneratorR.speechQ = speechQ
         }
     }
 
     private var audioEngine: AVAudioEngine?
     private var sourceNode: AVAudioSourceNode?
-    let noiseGenerator = NoiseGenerator()
+    let noiseGeneratorL = NoiseGenerator()  // Left channel
+    let noiseGeneratorR = NoiseGenerator()  // Right channel
 
-    var frequencies: [Float] { noiseGenerator.frequencies }
+    var frequencies: [Float] { noiseGeneratorL.frequencies }
 
     private let sampleRate: Double = 44100
     private var fadeLevel: Float = 0
@@ -80,6 +86,10 @@ class AudioEngine: ObservableObject {
 
                 let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
 
+                // Get left and right channel buffers
+                let leftBuf = ablPointer.count > 0 ? ablPointer[0].mData?.assumingMemoryBound(to: Float.self) : nil
+                let rightBuf = ablPointer.count > 1 ? ablPointer[1].mData?.assumingMemoryBound(to: Float.self) : nil
+
                 for frame in 0..<Int(frameCount) {
                     // Fade in/out for smooth transitions
                     if self.isPlaying && self.fadeLevel < 1 {
@@ -88,13 +98,13 @@ class AudioEngine: ObservableObject {
                         self.fadeLevel = max(0, self.fadeLevel - self.fadeSpeed)
                     }
 
-                    let sample = self.noiseGenerator.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
-                    let adjustedSample = sample * self.volume * self.fadeLevel
+                    // Generate independent samples for true stereo
+                    let sampleL = self.noiseGeneratorL.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
+                    let sampleR = self.noiseGeneratorR.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
 
-                    for buffer in ablPointer {
-                        let buf = buffer.mData?.assumingMemoryBound(to: Float.self)
-                        buf?[frame] = adjustedSample
-                    }
+                    let gain = self.volume * self.fadeLevel
+                    leftBuf?[frame] = sampleL * gain
+                    rightBuf?[frame] = sampleR * gain
                 }
 
                 return noErr
@@ -108,7 +118,8 @@ class AudioEngine: ObservableObject {
             self.audioEngine = engine
             self.sourceNode = source
             self.isPlaying = true
-            self.noiseGenerator.reset()
+            self.noiseGeneratorL.reset()
+            self.noiseGeneratorR.reset()
 
         } catch {
             print("Failed to start audio engine: \(error)")
