@@ -24,8 +24,8 @@ jobs:
 
       - name: Build app
         run: |
-          xcodebuild -project WhiteNoise/WhiteNoise.xcodeproj \
-            -scheme WhiteNoise \
+          xcodebuild -project Hush/Hush.xcodeproj \
+            -scheme Hush \
             -configuration Release \
             -derivedDataPath .build \
             -arch arm64 -arch x86_64 \
@@ -38,14 +38,14 @@ jobs:
       - name: Package app
         run: |
           mkdir -p dist
-          cp -R .build/Build/Products/Release/WhiteNoise.app dist/
-          cd dist && zip -r WhiteNoise.zip WhiteNoise.app
+          cp -R .build/Build/Products/Release/Hush.app dist/
+          cd dist && zip -r Hush.zip Hush.app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WhiteNoise
-          path: dist/WhiteNoise.zip
+          name: Hush
+          path: dist/Hush.zip
 
       - name: Create nightly release
         if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
@@ -54,7 +54,7 @@ jobs:
           name: Nightly Build
           tag_name: nightly
           prerelease: true
-          files: dist/WhiteNoise.zip
+          files: dist/Hush.zip
           body: |
             Automated nightly build from main branch.
 
@@ -64,5 +64,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/WhiteNoise.zip
+          files: dist/Hush.zip
           generate_release_notes: true

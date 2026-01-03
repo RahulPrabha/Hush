@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AAA00001 /* WhiteNoiseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00010 /* WhiteNoiseApp.swift */; };
+		AAA00001 /* HushApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00010 /* HushApp.swift */; };
 		AAA00002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00011 /* ContentView.swift */; };
 		AAA00003 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00012 /* AudioEngine.swift */; };
 		AAA00004 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013 /* NoiseGenerator.swift */; };
@@ -15,12 +15,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AAA00010 /* WhiteNoiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteNoiseApp.swift; sourceTree = "<group>"; };
+		AAA00010 /* HushApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HushApp.swift; sourceTree = "<group>"; };
 		AAA00011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AAA00012 /* AudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngine.swift; sourceTree = "<group>"; };
 		AAA00013 /* NoiseGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseGenerator.swift; sourceTree = "<group>"; };
 		AAA00015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AAA00020 /* WhiteNoise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhiteNoise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAA00020 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,27 +37,27 @@
 		AAA00040 = {
 			isa = PBXGroup;
 			children = (
-				AAA00041 /* WhiteNoise */,
+				AAA00041 /* Hush */,
 				AAA00042 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		AAA00041 /* WhiteNoise */ = {
+		AAA00041 /* Hush */ = {
 			isa = PBXGroup;
 			children = (
-				AAA00010 /* WhiteNoiseApp.swift */,
+				AAA00010 /* HushApp.swift */,
 				AAA00011 /* ContentView.swift */,
 				AAA00012 /* AudioEngine.swift */,
 				AAA00013 /* NoiseGenerator.swift */,
 				AAA00015 /* Assets.xcassets */,
 			);
-			path = WhiteNoise;
+			path = Hush;
 			sourceTree = "<group>";
 		};
 		AAA00042 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AAA00020 /* WhiteNoise.app */,
+				AAA00020 /* Hush.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,9 +65,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AAA00050 /* WhiteNoise */ = {
+		AAA00050 /* Hush */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AAA00060 /* Build configuration list for PBXNativeTarget "WhiteNoise" */;
+			buildConfigurationList = AAA00060 /* Build configuration list for PBXNativeTarget "Hush" */;
 			buildPhases = (
 				AAA00051 /* Sources */,
 				AAA00030 /* Frameworks */,
@@ -77,9 +77,9 @@
 			);
 			dependencies = (
 			);
-			name = WhiteNoise;
-			productName = WhiteNoise;
-			productReference = AAA00020 /* WhiteNoise.app */;
+			name = Hush;
+			productName = Hush;
+			productReference = AAA00020 /* Hush.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -97,7 +97,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AAA00071 /* Build configuration list for PBXProject "WhiteNoise" */;
+			buildConfigurationList = AAA00071 /* Build configuration list for PBXProject "Hush" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -110,7 +110,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AAA00050 /* WhiteNoise */,
+				AAA00050 /* Hush */,
 			);
 		};
 /* End PBXProject section */
@@ -276,7 +276,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.whitenoise.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hush.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -305,7 +305,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.whitenoise.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hush.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -315,7 +315,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AAA00060 /* Build configuration list for PBXNativeTarget "WhiteNoise" */ = {
+		AAA00060 /* Build configuration list for PBXNativeTarget "Hush" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AAA00082 /* Debug */,
@@ -324,7 +324,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AAA00071 /* Build configuration list for PBXProject "WhiteNoise" */ = {
+		AAA00071 /* Build configuration list for PBXProject "Hush" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AAA00080 /* Debug */,

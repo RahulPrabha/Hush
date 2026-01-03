@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "Building WhiteNoise..."
+echo "Building Hush..."
 
-xcodebuild -project WhiteNoise/WhiteNoise.xcodeproj \
-  -scheme WhiteNoise \
+xcodebuild -project Hush/Hush.xcodeproj \
+  -scheme Hush \
   -configuration Release \
   -derivedDataPath .build \
   -arch arm64 -arch x86_64 \
@@ -15,8 +15,8 @@ xcodebuild -project WhiteNoise/WhiteNoise.xcodeproj \
   build
 
 mkdir -p dist
-rm -rf dist/WhiteNoise.app
-cp -R .build/Build/Products/Release/WhiteNoise.app dist/
+rm -rf dist/Hush.app
+cp -R .build/Build/Products/Release/Hush.app dist/
 
 echo ""
-echo "Build complete: dist/WhiteNoise.app"
+echo "Build complete: dist/Hush.app"

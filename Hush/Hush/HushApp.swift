@@ -3,7 +3,7 @@ import AppKit
 import Combine
 
 @main
-struct WhiteNoiseApp: App {
+struct HushApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
@@ -51,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private func updateIcon(isPlaying: Bool) {
         let image = NSImage(
             systemSymbolName: isPlaying ? "waveform" : "waveform.slash",
-            accessibilityDescription: "White Noise"
+            accessibilityDescription: "Hush"
         )
         image?.isTemplate = true
         statusItem.button?.image = image

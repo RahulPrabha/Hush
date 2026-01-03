@@ -16,7 +16,7 @@ struct ContentView: View {
         VStack(spacing: 16) {
             // Header
             HStack {
-                Text("White Noise")
+                Text("Hush")
                     .font(.headline)
                 Spacer()
                 Text(audioEngine.isPlaying ? "Playing" : "Stopped")
