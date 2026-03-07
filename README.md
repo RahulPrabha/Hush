@@ -10,6 +10,12 @@ I've used white noise for focus and concentration for over ten years. Over that 
 
 Now that I can build my own tools, I made exactly what I wanted: a small menu bar app that's always there. Right-click the icon to toggle sound. Left-click to open controls. No switching contexts, no hunting for a browser tab.
 
+## Privacy
+
+**Hush is fully offline.** It requires no network connection and makes none. There are no analytics, no telemetry, no servers, and no audio files — all sounds are generated algorithmically in real time using signal processing (white noise, pink noise via Paul Kellet's method, brown noise via leaky integration, speech blocker via a 10-band EQ). Nothing leaves your Mac.
+
+You can verify this yourself: the full source is in this repo, and you can build it directly from Xcode.
+
 ## Features
 
 - **Menu bar native** — lives in your menu bar, out of the way until you need it
@@ -39,6 +45,18 @@ Requires macOS 13+.
 | Left-click menu bar icon | Open controls popover |
 | Space | Play/pause (when popover is open) |
 | ⌘Q | Quit |
+
+## Gatekeeper warning
+
+Hush is not signed with an Apple Developer certificate, so macOS will block it on first launch with a "cannot be opened" warning.
+
+To open it anyway:
+
+1. **Right-click** (or Control-click) the app
+2. Choose **Open**
+3. Click **Open** in the dialog that appears
+
+You only need to do this once. After that it opens normally.
 
 ## Building a release
 
