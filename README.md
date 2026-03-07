@@ -52,9 +52,10 @@ Hush is not signed with an Apple Developer certificate, so macOS will block it o
 
 To open it anyway:
 
-1. **Right-click** (or Control-click) the app
-2. Choose **Open**
-3. Click **Open** in the dialog that appears
+1. Try to open the app (it will be blocked)
+2. Go to **System Settings → Privacy & Security**
+3. Scroll down to the **Security** section
+4. You'll see a message saying "Hush was blocked" — click **Open Anyway**
 
 You only need to do this once. After that it opens normally.
 
