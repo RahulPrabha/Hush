@@ -25,8 +25,6 @@ struct ContentView: View {
                     .frame(width: 50, alignment: .trailing)
             }
 
-            Divider()
-
             // Noise Type Picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("Noise Type")

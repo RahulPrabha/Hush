@@ -161,13 +161,21 @@ class NoiseGenerator {
     // 10-band equalizer filters
     private var bandFilters: [BiquadFilter] = []
     let frequencies: [Float] = [20, 60, 125, 250, 500, 1000, 2000, 4000, 8000, 17000]
-    private let sampleRate: Float = 44100
+
+    // Sample rate - can be updated when audio configuration changes
+    var sampleRate: Float = 44100 {
+        didSet {
+            if sampleRate != oldValue {
+                rebuildFilters()
+            }
+        }
+    }
 
     // Custom EQ levels for tuning
     var customLevels: [Float] = [0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15]
 
     // Low-pass filter for brown noise
-    private var brownLowPass: LowPassFilter
+    private var brownLowPass: LowPassFilter!
     var brownCutoff: Float = 500 {
         didSet {
             brownLowPass.setCutoff(brownCutoff)
@@ -175,7 +183,7 @@ class NoiseGenerator {
     }
 
     // Bandpass filter for speech blocker
-    private var speechBandPass: BandPassFilter
+    private var speechBandPass: BandPassFilter!
     var speechCenter: Float = 200 {
         didSet {
             speechBandPass.setCenter(speechCenter, q: speechQ)
@@ -188,12 +196,16 @@ class NoiseGenerator {
     }
 
     init() {
-        brownLowPass = LowPassFilter(cutoff: 500, sampleRate: sampleRate)
-        speechBandPass = BandPassFilter(center: 200, q: 1.82, sampleRate: sampleRate)
-        setupFilters()
+        rebuildFilters()
     }
 
-    private func setupFilters() {
+    private func rebuildFilters() {
+        brownLowPass = LowPassFilter(cutoff: brownCutoff, sampleRate: sampleRate)
+        speechBandPass = BandPassFilter(center: speechCenter, q: speechQ, sampleRate: sampleRate)
+        setupBandFilters()
+    }
+
+    private func setupBandFilters() {
         // Q factor for bandpass - lower Q = wider band
         // Very wide bands for smooth, flat coverage
         let qFactors: [Float] = [0.3, 0.3, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.3, 0.3]

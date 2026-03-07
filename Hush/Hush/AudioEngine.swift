@@ -54,16 +54,45 @@ class AudioEngine: ObservableObject {
 
     var frequencies: [Float] { noiseGeneratorL.frequencies }
 
-    private let sampleRate: Double = 44100
     private var fadeLevel: Float = 0
     private let fadeSpeed: Float = 0.0005
+    private var shouldBePlaying = false  // Track user intent separately from engine state
 
     init() {
-        setupAudioSession()
+        setupNotifications()
     }
 
-    private func setupAudioSession() {
-        // macOS doesn't require audio session setup like iOS
+    private func setupNotifications() {
+        // Listen for audio configuration changes (device changes, sample rate changes, etc.)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleConfigurationChange),
+            name: .AVAudioEngineConfigurationChange,
+            object: nil
+        )
+    }
+
+    @objc private func handleConfigurationChange(_ notification: Notification) {
+        // Audio configuration changed (e.g., AirPods switched to mic mode, device changed)
+        // Restart the engine to adapt to new sample rate
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, self.shouldBePlaying else { return }
+            self.restartAudioEngine()
+        }
+    }
+
+    private func restartAudioEngine() {
+        // Clean up old engine
+        audioEngine?.stop()
+        audioEngine = nil
+        sourceNode = nil
+        fadeLevel = 0
+
+        // Restart after a brief delay to let the system settle
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self = self, self.shouldBePlaying else { return }
+            self.startEngine()
+        }
     }
 
     func toggle() {
@@ -75,10 +104,25 @@ class AudioEngine: ObservableObject {
     }
 
     func play() {
-        guard !isPlaying else { return }
+        guard !shouldBePlaying else { return }
+        shouldBePlaying = true
+        startEngine()
+    }
+
+    private func startEngine() {
+        guard shouldBePlaying else { return }
 
         do {
             let engine = AVAudioEngine()
+
+            // Use the hardware's actual sample rate to avoid pitch issues when audio config changes
+            let hardwareSampleRate = engine.outputNode.outputFormat(forBus: 0).sampleRate
+            let sampleRate = hardwareSampleRate > 0 ? hardwareSampleRate : 44100
+
+            // Update noise generators with current sample rate
+            noiseGeneratorL.sampleRate = Float(sampleRate)
+            noiseGeneratorR.sampleRate = Float(sampleRate)
+
             let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
 
             let source = AVAudioSourceNode { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
@@ -127,6 +171,7 @@ class AudioEngine: ObservableObject {
     }
 
     func stop() {
+        shouldBePlaying = false
         isPlaying = false
 
         // Allow fade out before stopping
@@ -144,5 +189,6 @@ class AudioEngine: ObservableObject {
 
     deinit {
         audioEngine?.stop()
+        NotificationCenter.default.removeObserver(self)
     }
 }
