@@ -50,6 +50,7 @@ jobs:
             ONLY_ACTIVE_ARCH=NO \
             CODE_SIGN_IDENTITY="Developer ID Application" \
             CODE_SIGN_STYLE=Manual \
+            OTHER_CODE_SIGN_FLAGS="--timestamp" \
             build
 
       - name: Create App Bundle
@@ -66,11 +67,21 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cd release
-          xcrun notarytool submit Hush.zip \
+          SUBMISSION_OUTPUT=$(xcrun notarytool submit Hush.zip \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait
+            --wait 2>&1)
+          echo "$SUBMISSION_OUTPUT"
+          SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | grep "id:" | head -1 | awk '{print $2}')
+          if echo "$SUBMISSION_OUTPUT" | grep -q "status: Invalid"; then
+            echo "Notarization failed. Fetching log..."
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_ID_PASSWORD" \
+              --team-id "$APPLE_TEAM_ID"
+            exit 1
+          fi
           xcrun stapler staple Hush.app
           rm Hush.zip
           zip -r Hush.zip Hush.app
