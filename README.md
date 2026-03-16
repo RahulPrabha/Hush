@@ -1,8 +1,8 @@
+![Hush Banner](docs/Hush%20Banner.jpg)
+
 # Hush
 
 A macOS menu bar app for ambient noise. White noise, brown noise, pink noise, and a speech blocker — one right-click away, no browser tab required.
-
-![Hush App Icon](docs/Hush%20App.png)
 
 ## Features
 
@@ -44,17 +44,3 @@ Download the latest `Hush.zip` from the [Releases](../../releases) page, unzip i
 
 Requires macOS 13+.
 
-## Gatekeeper warning
-
-Hush is not signed with an Apple Developer certificate, so macOS will block it on first launch with a "cannot be opened" warning.
-
-To open it anyway:
-
-1. Try to open the app (it will be blocked)
-2. Go to **System Settings → Privacy & Security**
-3. Scroll down to the **Security** section
-4. You'll see a message saying "Hush was blocked" — click **Open Anyway**
-
-![Open Anyway Instructions](docs/Open%20Anyway%20Instructions.png)
-
-You only need to do this once. After that it opens normally.
