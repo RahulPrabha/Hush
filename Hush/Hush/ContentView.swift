@@ -321,24 +321,33 @@ private struct SpectrumBar: View {
     let animating: Bool
     let delay: Double
     let duration: Double
-    @State private var scale: CGFloat = 1.0
+    // Toggles between resting (false → scale 1.0) and compressed (true → scale 0.4).
+    // repeatForever(autoreverses) bounces between the two extremes.
+    @State private var compressed = false
 
     var body: some View {
         RoundedRectangle(cornerRadius: 1)
             .fill(color)
             .frame(height: height)
-            .scaleEffect(x: 1, y: scale, anchor: .bottom)
-            .onAppear { restart() }
-            .onChange(of: animating) { _ in restart() }
+            .scaleEffect(x: 1, y: compressed ? 0.4 : 1.0, anchor: .bottom)
+            .onAppear { update() }
+            .onChange(of: animating) { _ in update() }
     }
 
-    private func restart() {
-        scale = 1.0
-        guard animating else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            scale = 0.45
-            withAnimation(.easeInOut(duration: duration).repeatForever(autoreverses: true)) {
-                scale = 1.1
+    private func update() {
+        if animating {
+            // Animate compressed → true; autoreverses keeps bars within [0.4, 1.0].
+            withAnimation(
+                .easeInOut(duration: duration)
+                    .delay(delay)
+                    .repeatForever(autoreverses: true)
+            ) {
+                compressed = true
+            }
+        } else {
+            // Override the repeatForever with a one-shot animation back to rest.
+            withAnimation(.easeInOut(duration: 0.25)) {
+                compressed = false
             }
         }
     }
@@ -388,7 +397,7 @@ private extension Text {
         self.font(.system(size: 10.5))
             .monospacedDigit()
             .foregroundColor(Color.primary.opacity(0.32))
-            .frame(width: 18)
+            .fixedSize()
     }
 }
 
