@@ -234,30 +234,28 @@ private struct NoiseRow: View {
 
     var body: some View {
         let c = pal(cs == .dark)
-        Button(action: onSelect) {
-            HStack(spacing: 10) {
-                RadioMark(selected: selected)
-                    .frame(width: 16, height: 16)
-                Text(type.rawValue)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(c.text)
-                Spacer(minLength: 8)
-                Text(type.description)
-                    .font(.system(size: 12))
-                    .foregroundColor(c.textMute)
-                Spectrum(shape: type.spectrumShape, active: selected, playing: playing)
-                    .frame(width: 44, height: 18)
-            }
-            .padding(.vertical, 9)
-            .padding(.horizontal, 10)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(selected ? c.rowSel : (hover ? c.rowHover : Color.clear))
-            )
-            .contentShape(Rectangle())
+        HStack(spacing: 10) {
+            RadioMark(selected: selected)
+                .frame(width: 16, height: 16)
+            Text(type.rawValue)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(c.text)
+            Spacer(minLength: 8)
+            Text(type.description)
+                .font(.system(size: 12))
+                .foregroundColor(c.textMute)
+            Spectrum(shape: type.spectrumShape, active: selected, playing: playing)
+                .frame(width: 44, height: 18)
         }
-        .buttonStyle(.plain)
+        .padding(.vertical, 9)
+        .padding(.horizontal, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(selected ? c.rowSel : (hover ? c.rowHover : Color.clear))
+        )
+        .contentShape(Rectangle())
         .onHover { hover = $0 }
+        .onTapGesture { onSelect() }
     }
 }
 
