@@ -274,13 +274,16 @@ private struct RadioMark: View {
         ZStack {
             Circle()
                 .stroke(selected ? c.accent : c.accent.opacity(0.28), lineWidth: 1.4)
-            if selected {
-                Circle()
-                    .fill(c.accent)
-                    .frame(width: 6.5, height: 6.5)
+            Group {
+                if selected {
+                    Circle()
+                        .fill(c.accent)
+                        .frame(width: 6.5, height: 6.5)
+                        .transition(.scale)
+                }
             }
+            .animation(.easeOut(duration: 0.15), value: selected)
         }
-        .animation(nil, value: selected)
     }
 }
 
