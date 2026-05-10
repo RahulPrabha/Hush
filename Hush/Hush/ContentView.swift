@@ -39,26 +39,29 @@ struct ContentView: View {
             NoiseSection(
                 selected: audioEngine.noiseType,
                 isPlaying: audioEngine.isPlaying,
-                onSelect: { audioEngine.noiseType = $0 }
+                onSelect: { type in withAnimation(.easeInOut(duration: 0.2)) { audioEngine.noiseType = type } }
             )
 
             Hairline()
 
             if audioEngine.noiseType == .brown {
-                ParamHero(sub: "Brown noise",
-                          label: "Low-pass cutoff",
-                          value: "\(Int(audioEngine.brownCutoff))",
-                          unit: "Hz")
-                SliderRow(
-                    leading: { Text("20").sliderEndStyle() },
-                    trailing: { Text("500").sliderEndStyle() },
-                    value: Binding(
-                        get: { Double(audioEngine.brownCutoff) },
-                        set: { audioEngine.brownCutoff = Float($0) }
-                    ),
-                    range: 20...500
-                )
-                Hairline()
+                VStack(spacing: 14) {
+                    ParamHero(sub: "Brown noise",
+                              label: "Low-pass cutoff",
+                              value: "\(Int(audioEngine.brownCutoff))",
+                              unit: "Hz")
+                    SliderRow(
+                        leading: { Text("20").sliderEndStyle() },
+                        trailing: { Text("500").sliderEndStyle() },
+                        value: Binding(
+                            get: { Double(audioEngine.brownCutoff) },
+                            set: { audioEngine.brownCutoff = Float($0) }
+                        ),
+                        range: 20...500
+                    )
+                    Hairline()
+                }
+                .transition(.opacity)
             }
 
             ParamHero(sub: "Master",
