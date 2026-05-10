@@ -39,30 +39,33 @@ struct ContentView: View {
             NoiseSection(
                 selected: audioEngine.noiseType,
                 isPlaying: audioEngine.isPlaying,
-                onSelect: { type in withAnimation(.easeInOut(duration: 0.2)) { audioEngine.noiseType = type } }
+                onSelect: { type in audioEngine.noiseType = type }
             )
 
             Hairline()
 
-            if audioEngine.noiseType == .brown {
-                VStack(spacing: 14) {
-                    ParamHero(sub: "Brown noise",
-                              label: "Low-pass cutoff",
-                              value: "\(Int(audioEngine.brownCutoff))",
-                              unit: "Hz")
-                    SliderRow(
-                        leading: { Text("20").sliderEndStyle() },
-                        trailing: { Text("500").sliderEndStyle() },
-                        value: Binding(
-                            get: { Double(audioEngine.brownCutoff) },
-                            set: { audioEngine.brownCutoff = Float($0) }
-                        ),
-                        range: 20...500
-                    )
-                    Hairline()
+            Group {
+                if audioEngine.noiseType == .brown {
+                    VStack(spacing: 14) {
+                        ParamHero(sub: "Brown noise",
+                                  label: "Low-pass cutoff",
+                                  value: "\(Int(audioEngine.brownCutoff))",
+                                  unit: "Hz")
+                        SliderRow(
+                            leading: { Text("20").sliderEndStyle() },
+                            trailing: { Text("500").sliderEndStyle() },
+                            value: Binding(
+                                get: { Double(audioEngine.brownCutoff) },
+                                set: { audioEngine.brownCutoff = Float($0) }
+                            ),
+                            range: 20...500
+                        )
+                        Hairline()
+                    }
+                    .transition(.opacity)
                 }
-                .transition(.opacity)
             }
+            .animation(.easeInOut(duration: 0.2), value: audioEngine.noiseType == .brown)
 
             ParamHero(sub: "Master",
                       label: "Volume",
@@ -275,10 +278,9 @@ private struct RadioMark: View {
                 Circle()
                     .fill(c.accent)
                     .frame(width: 6.5, height: 6.5)
-                    .transition(.scale)
             }
         }
-        .animation(.easeOut(duration: 0.15), value: selected)
+        .animation(nil, value: selected)
     }
 }
 
@@ -498,16 +500,15 @@ private struct FooterToolbar: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            ToolButton(systemName: "info.circle", help: "About Hush") {
-                NSApp.orderFrontStandardAboutPanel(nil)
-                NSApp.activate(ignoringOtherApps: true)
-            }
-            Spacer()
             ToolButton(
                 systemName: isDarkMode ? "sun.max" : "moon",
                 help: isDarkMode ? "Switch to light mode" : "Switch to dark mode"
             ) {
                 isDarkMode.toggle()
+            }
+            Spacer()
+            ToolButton(systemName: "power", help: "Quit Hush") {
+                NSApp.terminate(nil)
             }
         }
         .padding(.horizontal, 2)
