@@ -35,6 +35,17 @@ enum NoiseType: String, CaseIterable, Identifiable {
     var usesEqualizer: Bool {
         return eqLevels != nil
     }
+
+    // 8-bar mini spectrum shape used by the popover's per-row eq glyph.
+    // Heights are 0–1, normalized for visual distinction, not measurement.
+    var spectrumShape: [Float] {
+        switch self {
+        case .white:         return [0.78, 0.82, 0.78, 0.84, 0.80, 0.82, 0.78, 0.84]
+        case .pink:          return [0.95, 0.85, 0.75, 0.65, 0.56, 0.48, 0.42, 0.36]
+        case .brown:         return [0.96, 0.82, 0.62, 0.45, 0.32, 0.22, 0.16, 0.12]
+        case .speechBlocker: return [0.40, 0.55, 0.72, 0.92, 0.88, 0.76, 0.55, 0.36]
+        }
+    }
 }
 
 // Biquad bandpass filter for each frequency band

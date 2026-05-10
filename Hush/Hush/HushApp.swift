@@ -33,10 +33,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
         // Create popover
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 400)
+        popover.contentSize = NSSize(width: 360, height: 480)
         popover.behavior = .transient
         popover.animates = false
         popover.delegate = self
+        popover.appearance = NSAppearance(named: .darkAqua)
         popover.contentViewController = NSHostingController(rootView: ContentView(audioEngine: audioEngine))
 
         // Update icon when playing state changes
