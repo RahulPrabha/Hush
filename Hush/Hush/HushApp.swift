@@ -51,12 +51,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     private func updateIcon(isPlaying: Bool) {
-        let image = NSImage(
+        let canvasSize = NSSize(width: 18, height: 18)
+        let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+        guard let symbol = NSImage(
             systemSymbolName: isPlaying ? "waveform" : "waveform.slash",
             accessibilityDescription: "Hush"
-        )
-        image?.isTemplate = true
-        statusItem.button?.image = image
+        )?.withSymbolConfiguration(config) else { return }
+
+        let canvas = NSImage(size: canvasSize)
+        canvas.lockFocus()
+        let s = symbol.size
+        symbol.draw(in: NSRect(
+            x: (canvasSize.width - s.width) / 2,
+            y: (canvasSize.height - s.height) / 2,
+            width: s.width,
+            height: s.height
+        ))
+        canvas.unlockFocus()
+        canvas.isTemplate = true
+        statusItem.button?.image = canvas
     }
 
     @objc func handleClick(_ sender: NSStatusBarButton) {
