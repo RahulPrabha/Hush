@@ -68,19 +68,24 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cd release
+          set +e
           SUBMISSION_OUTPUT=$(xcrun notarytool submit Hush.zip \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
             --wait 2>&1)
+          NOTARYTOOL_EXIT=$?
+          set -e
           echo "$SUBMISSION_OUTPUT"
           SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | grep "id:" | head -1 | awk '{print $2}')
-          if echo "$SUBMISSION_OUTPUT" | grep -q "status: Invalid"; then
-            echo "Notarization failed. Fetching log..."
-            xcrun notarytool log "$SUBMISSION_ID" \
-              --apple-id "$APPLE_ID" \
-              --password "$APPLE_ID_PASSWORD" \
-              --team-id "$APPLE_TEAM_ID"
+          if [ "$NOTARYTOOL_EXIT" -ne 0 ] || echo "$SUBMISSION_OUTPUT" | grep -q "status: Invalid"; then
+            echo "Notarization failed (exit $NOTARYTOOL_EXIT). Fetching log..."
+            if [ -n "$SUBMISSION_ID" ]; then
+              xcrun notarytool log "$SUBMISSION_ID" \
+                --apple-id "$APPLE_ID" \
+                --password "$APPLE_ID_PASSWORD" \
+                --team-id "$APPLE_TEAM_ID"
+            fi
             exit 1
           fi
           xcrun stapler staple Hush.app
