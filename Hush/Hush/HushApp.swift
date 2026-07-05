@@ -65,27 +65,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let canvasSize = NSSize(width: 18, height: 18)
         let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
         guard let symbol = NSImage(
-            systemSymbolName: isPlaying ? "ear.badge.waveform" : "ear",
+            systemSymbolName: isPlaying ? "waveform" : "waveform.slash",
             accessibilityDescription: "Hush"
         )?.withSymbolConfiguration(config) else { return }
-
-        // Both symbols share the same ear glyph in their top-left corner; the
-        // "waveform" badge only extends down and to the right. Centering each
-        // symbol by its own (differently sized) bounding box would shift the
-        // ear when toggling — the icon appears to "hop". Instead, anchor every
-        // state's top-left to the plain ear's centered position so the ear
-        // stays put and only the badge appears/disappears.
-        let earSize = NSImage(systemSymbolName: "ear", accessibilityDescription: nil)?
-            .withSymbolConfiguration(config)?.size ?? symbol.size
-        let anchorX = (canvasSize.width - earSize.width) / 2
-        let topGap = (canvasSize.height - earSize.height) / 2
 
         let canvas = NSImage(size: canvasSize)
         canvas.lockFocus()
         let s = symbol.size
         symbol.draw(in: NSRect(
-            x: anchorX,
-            y: canvasSize.height - topGap - s.height,
+            x: (canvasSize.width - s.width) / 2,
+            y: (canvasSize.height - s.height) / 2,
             width: s.width,
             height: s.height
         ))
