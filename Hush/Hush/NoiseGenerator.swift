@@ -227,7 +227,9 @@ class NoiseGenerator {
     }
 
     func reset() {
-        pinkState = [0, 0, 0, 0, 0, 0, 0]
+        // Zero in place: reassigning the array would free a buffer the
+        // render thread may be reading, and allocate on the audio thread.
+        for i in pinkState.indices { pinkState[i] = 0 }
         brownState = 0
         bandFilters.forEach { $0.reset() }
         brownLowPass.reset()

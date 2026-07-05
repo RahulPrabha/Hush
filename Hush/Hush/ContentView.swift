@@ -27,6 +27,9 @@ private func pal(_ isDark: Bool) -> (
 
 struct ContentView: View {
     @ObservedObject var audioEngine: AudioEngine
+    // Reports the content's laid-out height each frame so the popover window
+    // can track SwiftUI's height animation instead of snapping to the target.
+    var onHeightChange: ((CGFloat) -> Void)? = nil
     @AppStorage("selectedNoiseType") private var selectedNoiseType = "White"
     @AppStorage("savedVolume") private var savedVolume = 0.5
     @AppStorage("isDarkMode") private var isDarkMode = true
@@ -39,7 +42,9 @@ struct ContentView: View {
             NoiseSection(
                 selected: audioEngine.noiseType,
                 isPlaying: audioEngine.isPlaying,
-                onSelect: { type in audioEngine.noiseType = type }
+                onSelect: { type in
+                    withAnimation(.easeInOut(duration: 0.2)) { audioEngine.noiseType = type }
+                }
             )
 
             Hairline()
@@ -65,7 +70,6 @@ struct ContentView: View {
                     .transition(.opacity)
                 }
             }
-            .animation(.easeInOut(duration: 0.2), value: audioEngine.noiseType == .brown)
 
             ParamHero(sub: "Master",
                       label: "Volume",
@@ -117,6 +121,13 @@ struct ContentView: View {
         .padding(EdgeInsets(top: 18, leading: 18, bottom: 12, trailing: 18))
         .frame(width: 360)
         .background(c.surface)
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { onHeightChange?(geo.size.height) }
+                    .onChange(of: geo.size.height) { onHeightChange?($0) }
+            }
+        )
         .preferredColorScheme(isDarkMode ? .dark : .light)
         .onAppear {
             if let type = NoiseType(rawValue: selectedNoiseType) {
@@ -271,18 +282,19 @@ private struct RadioMark: View {
 
     var body: some View {
         let c = pal(cs == .dark)
-        ZStack {
-            Circle()
-                .stroke(selected ? c.accent : c.accent.opacity(0.28), lineWidth: 1.4)
-            Group {
-                if selected {
-                    Circle()
-                        .fill(c.accent)
-                        .frame(width: 6.5, height: 6.5)
-                        .transition(.scale)
-                }
+        // Ring and dot are drawn in one Canvas so they share a single layer:
+        // separate circle views commit on separate layers, which the
+        // compositor misregisters while the popover window is live-resizing
+        // (the dot appeared to float outside the ring mid-transition).
+        Canvas { ctx, size in
+            let ringRect = CGRect(origin: .zero, size: size).insetBy(dx: 0.7, dy: 0.7)
+            let ringColor = selected ? c.accent : c.accent.opacity(0.28)
+            ctx.stroke(Circle().path(in: ringRect), with: .color(ringColor), lineWidth: 1.4)
+            if selected {
+                let d: CGFloat = 6.5
+                let dotRect = CGRect(x: (size.width - d) / 2, y: (size.height - d) / 2, width: d, height: d)
+                ctx.fill(Circle().path(in: dotRect), with: .color(c.accent))
             }
-            .animation(.easeOut(duration: 0.15), value: selected)
         }
     }
 }
@@ -304,58 +316,30 @@ private struct Spectrum: View {
         let c = pal(cs == .dark)
         let barW = (totalWidth - gap * CGFloat(barCount - 1)) / CGFloat(barCount)
         let tint: Color = active ? c.accent : c.textDim
+        let animating = active && playing
 
-        HStack(alignment: .bottom, spacing: gap) {
-            ForEach(0..<barCount, id: \.self) { i in
-                SpectrumBar(
-                    height: max(2, CGFloat(shape[i]) * totalHeight),
-                    color: tint,
-                    animating: active && playing,
-                    delay: Double(i) * 0.05,
-                    duration: 0.55 + Double(i % 4) * 0.13
-                )
-                .frame(width: barW)
+        // Bar heights are a pure function of the current time: no repeatForever
+        // animations to leak into layout changes, no view identity swaps.
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !animating)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate
+            HStack(alignment: .bottom, spacing: gap) {
+                ForEach(0..<barCount, id: \.self) { i in
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(tint)
+                        .frame(width: barW, height: max(2, CGFloat(shape[i]) * totalHeight))
+                        .scaleEffect(x: 1, y: animating ? bounce(t, i) : 1.0, anchor: .bottom)
+                }
             }
+            .frame(width: totalWidth, height: totalHeight, alignment: .bottom)
         }
         .frame(width: totalWidth, height: totalHeight, alignment: .bottom)
     }
-}
 
-private struct SpectrumBar: View {
-    let height: CGFloat
-    let color: Color
-    let animating: Bool
-    let delay: Double
-    let duration: Double
-    // Toggles between resting (false → scale 1.0) and compressed (true → scale 0.4).
-    // repeatForever(autoreverses) bounces between the two extremes.
-    @State private var compressed = false
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 1)
-            .fill(color)
-            .frame(height: height)
-            .scaleEffect(x: 1, y: compressed ? 0.4 : 1.0, anchor: .bottom)
-            .onAppear { update() }
-            .onChange(of: animating) { _ in update() }
-    }
-
-    private func update() {
-        if animating {
-            // Animate compressed → true; autoreverses keeps bars within [0.4, 1.0].
-            withAnimation(
-                .easeInOut(duration: duration)
-                    .delay(delay)
-                    .repeatForever(autoreverses: true)
-            ) {
-                compressed = true
-            }
-        } else {
-            // Override the repeatForever with a one-shot animation back to rest.
-            withAnimation(.easeInOut(duration: 0.25)) {
-                compressed = false
-            }
-        }
+    // Oscillates each bar between 0.4 and 1.0 with per-bar speed and phase.
+    private func bounce(_ t: TimeInterval, _ i: Int) -> CGFloat {
+        let duration = 0.55 + Double(i % 4) * 0.13
+        let phase = Double(i) * 0.35
+        return 0.7 + 0.3 * sin(t * .pi / duration + phase)
     }
 }
 

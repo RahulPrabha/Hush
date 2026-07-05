@@ -11,10 +11,12 @@ class AudioEngine: ObservableObject {
     }
     @Published var noiseType: NoiseType = .white {
         didSet {
-            noiseGeneratorL.reset()
-            noiseGeneratorR.reset()
+            // Don't touch generator state here: the render thread may be
+            // mid-generateSample. It performs the reset at the next buffer.
+            needsGeneratorReset = true
         }
     }
+    private var needsGeneratorReset = false
 
     // Custom EQ controls
     @Published var useCustomEQ = true
@@ -128,6 +130,12 @@ class AudioEngine: ObservableObject {
             let source = AVAudioSourceNode { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
                 guard let self = self else { return noErr }
 
+                if self.needsGeneratorReset {
+                    self.needsGeneratorReset = false
+                    self.noiseGeneratorL.reset()
+                    self.noiseGeneratorR.reset()
+                }
+
                 let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
 
                 // Get left and right channel buffers
@@ -157,13 +165,14 @@ class AudioEngine: ObservableObject {
             engine.attach(source)
             engine.connect(source, to: engine.mainMixerNode, format: format)
 
+            noiseGeneratorL.reset()
+            noiseGeneratorR.reset()
+
             try engine.start()
 
             self.audioEngine = engine
             self.sourceNode = source
             self.isPlaying = true
-            self.noiseGeneratorL.reset()
-            self.noiseGeneratorR.reset()
 
         } catch {
             print("Failed to start audio engine: \(error)")
