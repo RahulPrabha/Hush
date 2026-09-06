@@ -2,16 +2,14 @@
 
 # Hush
 
-A macOS menu bar app for ambient noise. White noise, brown noise, pink noise, and a speech blocker — one right-click away, no browser tab required.
+A macOS menu bar app for ambient noise. Brown noise and a speech blocker — one right-click away, no browser tab required.
 
 ## Features
 
 - **Menu bar native** — lives in your menu bar, out of the way until you need it
 - **Right-click to toggle** — start/stop sound without opening anything
 - **Left-click for controls** — noise type picker, volume slider, and more
-- **Four noise types:**
-  - **White** — flat, crisp, full spectrum
-  - **Pink** — balanced, natural, 1/f spectrum
+- **Two noise types:**
   - **Brown** — deep, rumbling, low-frequency rumble
   - **Speech Blocker** — shaped specifically to mask human voices
 - **Brown noise low-pass cutoff** — adjustable filter from 20–500 Hz
@@ -25,7 +23,7 @@ Now that I can build my own tools, I made exactly what I wanted: a small menu ba
 
 ## Privacy
 
-**Hush is fully offline.** It requires no network connection and makes none. There are no analytics, no telemetry, no servers, and no audio files — all sounds are generated algorithmically in real time using signal processing (white noise, pink noise via Paul Kellet's method, brown noise via leaky integration, speech blocker via a 10-band EQ). Nothing leaves your Mac.
+**Hush is fully offline.** It requires no network connection and makes none. There are no analytics, no telemetry, no servers, and no audio files — all sounds are generated algorithmically in real time using signal processing (brown noise via leaky integration and a low-pass filter, speech blocker via pink noise from Paul Kellet's method shaped by a 10-band EQ). Nothing leaves your Mac.
 
 You can verify this yourself: the full source is in this repo, and you can build it directly from Xcode.
 

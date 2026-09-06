@@ -13,10 +13,16 @@ struct HushApp: App {
     }
 }
 
+/// Whether the controls popover is currently on screen.
+final class PopoverState: ObservableObject {
+    @Published var isShown = false
+}
+
 class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     let audioEngine = AudioEngine()
+    let popoverState = PopoverState()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create status item
@@ -40,6 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         popover.appearance = NSAppearance(named: .darkAqua)
         let hosting = NSHostingController(rootView: ContentView(
             audioEngine: audioEngine,
+            popoverState: popoverState,
             onHeightChange: { [weak self] h in self?.contentHeightChanged(to: h) }
         ))
         // Don't let the hosting controller push its preferred size to the
@@ -60,6 +67,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     private var cancellables = Set<AnyCancellable>()
+
+    // MARK: NSPopoverDelegate
+
+    func popoverDidShow(_ notification: Notification) {
+        popoverState.isShown = true
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        popoverState.isShown = false
+    }
 
     private func updateIcon(isPlaying: Bool) {
         let canvasSize = NSSize(width: 18, height: 18)

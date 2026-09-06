@@ -9,7 +9,7 @@ class AudioEngine: ObservableObject {
             updateVolume()
         }
     }
-    @Published var noiseType: NoiseType = .white {
+    @Published var noiseType: NoiseType = .brown {
         didSet {
             // Don't touch generator state here: the render thread may be
             // mid-generateSample. It performs the reset at the next buffer.

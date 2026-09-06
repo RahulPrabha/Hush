@@ -27,10 +27,13 @@ private func pal(_ isDark: Bool) -> (
 
 struct ContentView: View {
     @ObservedObject var audioEngine: AudioEngine
+    // Whether the popover is on screen. Drives the bar animation so it
+    // doesn't burn CPU re-rendering at 30 fps while nobody can see it.
+    @ObservedObject var popoverState: PopoverState
     // Reports the content's laid-out height each frame so the popover window
     // can track SwiftUI's height animation instead of snapping to the target.
     var onHeightChange: ((CGFloat) -> Void)? = nil
-    @AppStorage("selectedNoiseType") private var selectedNoiseType = "White"
+    @AppStorage("selectedNoiseType") private var selectedNoiseType = "Brown"
     @AppStorage("savedVolume") private var savedVolume = 0.5
     @AppStorage("isDarkMode") private var isDarkMode = true
 
@@ -41,7 +44,7 @@ struct ContentView: View {
 
             NoiseSection(
                 selected: audioEngine.noiseType,
-                isPlaying: audioEngine.isPlaying,
+                animateBars: audioEngine.isPlaying && popoverState.isShown,
                 onSelect: { type in
                     withAnimation(.easeInOut(duration: 0.2)) { audioEngine.noiseType = type }
                 }
@@ -132,6 +135,10 @@ struct ContentView: View {
         .onAppear {
             if let type = NoiseType(rawValue: selectedNoiseType) {
                 audioEngine.noiseType = type
+            } else {
+                // Saved value refers to a removed type (White/Pink); fall
+                // back to the engine default and persist it.
+                selectedNoiseType = audioEngine.noiseType.rawValue
             }
             audioEngine.volume = Float(savedVolume)
         }
@@ -213,7 +220,7 @@ private struct StatusPill: View {
 
 private struct NoiseSection: View {
     let selected: NoiseType
-    let isPlaying: Bool
+    let animateBars: Bool
     let onSelect: (NoiseType) -> Void
     @Environment(\.colorScheme) private var cs
 
@@ -231,7 +238,7 @@ private struct NoiseSection: View {
                     NoiseRow(
                         type: type,
                         selected: type == selected,
-                        playing: isPlaying,
+                        playing: animateBars,
                         onSelect: { onSelect(type) }
                     )
                 }

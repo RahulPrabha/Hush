@@ -2,8 +2,6 @@ import Foundation
 import AVFoundation
 
 enum NoiseType: String, CaseIterable, Identifiable {
-    case white = "White"
-    case pink = "Pink"
     case brown = "Brown"
     case speechBlocker = "Speech Blocker"
 
@@ -11,8 +9,6 @@ enum NoiseType: String, CaseIterable, Identifiable {
 
     var description: String {
         switch self {
-        case .white: return "Flat, crisp"
-        case .pink: return "Balanced, natural"
         case .brown: return "Deep, rumbling"
         case .speechBlocker: return "Masks voices"
         }
@@ -27,8 +23,6 @@ enum NoiseType: String, CaseIterable, Identifiable {
             return [0.614, 0.564, 0.515, 0.466, 0.417, 0.368, 0.331, 0.294, 0.258, 0.221]
         case .speechBlocker:
             return [0.14, 0.22, 0.28, 0.40, 0.46, 0.42, 0.28, 0.21, 0.13, 0.05]
-        default:
-            return nil
         }
     }
 
@@ -40,8 +34,6 @@ enum NoiseType: String, CaseIterable, Identifiable {
     // Heights are 0–1, normalized for visual distinction, not measurement.
     var spectrumShape: [Float] {
         switch self {
-        case .white:         return [0.78, 0.82, 0.78, 0.84, 0.80, 0.82, 0.78, 0.84]
-        case .pink:          return [0.95, 0.85, 0.75, 0.65, 0.56, 0.48, 0.42, 0.36]
         case .brown:         return [0.96, 0.82, 0.62, 0.45, 0.32, 0.22, 0.16, 0.12]
         case .speechBlocker: return [0.40, 0.55, 0.72, 0.92, 0.88, 0.76, 0.55, 0.36]
         }
@@ -238,10 +230,6 @@ class NoiseGenerator {
 
     func generateSample(type: NoiseType, useCustomLevels: Bool = false) -> Float {
         switch type {
-        case .white:
-            return generateWhiteNoise()
-        case .pink:
-            return generatePinkNoise()
         case .brown:
             return generateBrownNoise()
         case .speechBlocker:
@@ -293,12 +281,8 @@ class NoiseGenerator {
         return output * 0.8
     }
 
-    // White noise: random values with flat frequency spectrum
-    private func generateWhiteNoise() -> Float {
-        return Float.random(in: -1...1)
-    }
-
-    // Pink noise: 1/f spectrum using Paul Kellet's refined method
+    // Pink noise: 1/f spectrum using Paul Kellet's refined method.
+    // Not a selectable type; used as the base signal for the speech blocker.
     private func generatePinkNoise() -> Float {
         let white = Float.random(in: -1...1)
 
