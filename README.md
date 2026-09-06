@@ -13,7 +13,9 @@ A macOS menu bar app for ambient noise. Brown noise and a speech blocker — one
   - **Brown** — deep, rumbling, low-frequency rumble
   - **Speech Blocker** — shaped specifically to mask human voices
 - **Brown noise low-pass cutoff** — adjustable filter from 20–500 Hz
-- **Remembers your settings** — last used noise type and volume persist across launches
+- **Smooth start and stop** — audio fades in and out instead of cutting abruptly
+- **Light and dark mode** — toggle from the popover footer
+- **Remembers your settings** — last used noise type, volume, and appearance persist across launches
 
 ## Why I built this
 
@@ -41,4 +43,42 @@ You can verify this yourself: the full source is in this repo, and you can build
 Download the latest `Hush.zip` from the [Releases](../../releases) page, unzip it, and move `Hush.app` to your `/Applications` folder.
 
 Requires macOS 13+.
+
+## Building from source
+
+Open `Hush/Hush.xcodeproj` in Xcode and run the `Hush` scheme, or build a
+universal release binary from the command line:
+
+```sh
+./build.sh
+```
+
+The result is written to `dist/Hush.app`.
+
+## Changelog
+
+### v1.2.0
+
+- Removed White and Pink noise; Brown is now the default
+- Fixed the spectrum bars continuing to animate after playback stops
+- Bars no longer redraw while the popover is closed, saving CPU during long sessions
+- Fixed popover resize glitches when switching noise types
+- Fixed an audio-thread crash when changing noise type mid-playback
+
+### v1.1.0
+
+- Redesigned popover with light and dark mode, large parameter readouts, and a mini spectrum per noise type
+- Popover height animates when switching noise types
+
+### v1.0.1
+
+- Fixed code signing and notarization in the release workflow
+
+### v1.0.0
+
+- Initial release
+
+## License
+
+[MIT](LICENSE)
 
