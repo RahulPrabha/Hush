@@ -40,9 +40,11 @@ You can verify this yourself: the full source is in this repo, and you can build
 
 ## Installation
 
-Download the latest `Hush.zip` from the [Releases](../../releases) page, unzip it, and move `Hush.app` to your `/Applications` folder.
+**[Download Hush](https://rahulp6.gumroad.com/l/hush)** — pay what you want, $0 is fine. Unzip and move `Hush.app` to your `/Applications` folder.
 
-Requires macOS 13+.
+Prefer GitHub? The same build is on the [Releases](../../releases) page, or build it yourself (see below).
+
+Requires macOS 13+. Apple notarized, so it just opens.
 
 ## Building from source
 
