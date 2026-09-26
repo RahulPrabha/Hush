@@ -57,7 +57,30 @@ universal release binary from the command line:
 
 The result is written to `dist/Hush.app`.
 
+### Mac App Store archive
+
+The app is sandboxed (`Hush/Hush/Hush.entitlements`) and ships a privacy
+manifest (`Hush/Hush/PrivacyInfo.xcprivacy`). To produce an App Store package
+locally (this exports only; it does not upload), you need a Mac App Store
+distribution certificate, a Mac Installer Distribution certificate, and an App
+Store provisioning profile for `com.rahulprabhakar.hush`:
+
+```sh
+xcodebuild -project Hush/Hush.xcodeproj -scheme Hush -configuration Release \
+  -destination 'generic/platform=macOS' -archivePath build/Hush.xcarchive archive
+xcodebuild -exportArchive -archivePath build/Hush.xcarchive \
+  -exportOptionsPlist Hush/ExportOptions-AppStore.plist -exportPath build/export
+```
+
+Bump `CURRENT_PROJECT_VERSION` for every upload and `MARKETING_VERSION` for
+every release.
+
 ## Changelog
+
+### Unreleased
+
+- Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store
+- The app now reports its real version (1.2.0) instead of 1.0
 
 ### v1.2.0
 
