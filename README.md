@@ -77,10 +77,10 @@ every release.
 
 ## Changelog
 
-### Unreleased
+### v1.3.0 (unreleased)
 
 - Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store
-- The app now reports its real version (1.2.0) instead of 1.0
+- The app now reports its real version (1.3.0) instead of 1.0
 
 ### v1.2.0
 
