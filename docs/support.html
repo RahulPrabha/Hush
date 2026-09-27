@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hush Support</title>
+<meta name="description" content="Help for Hush, the macOS menu bar app for brown noise and speech blocking.">
+<style>
+:root{color-scheme:light dark;--bg:#fbfaf8;--fg:#1d1c1a;--muted:#5f5b55;--line:#e3dfd8;--link:#8a4b1f}
+@media (prefers-color-scheme:dark){:root{--bg:#161412;--fg:#ece8e2;--muted:#a8a29a;--line:#2e2a26;--link:#e0a576}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif}
+main{max-width:42rem;margin:0 auto;padding:2.5rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2;margin:0 0 .25rem}h2{font-size:1.2rem;margin:2rem 0 .5rem}h3{font-size:1rem;margin:1.25rem 0 .25rem}
+p,ul,ol{margin:.5rem 0}.meta{color:var(--muted);margin-bottom:1.5rem}a{color:var(--link)}
+code{font:.9em ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--line);padding:.1em .35em;border-radius:4px;overflow-wrap:anywhere}
+table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--line);vertical-align:top}
+nav{font-size:.9rem;color:var(--muted);margin-bottom:2rem}footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<nav><a href="index.html">Hush</a> / Support</nav>
+<h1>Hush Support</h1>
+<p class="meta">Help for Hush on macOS 13 and later.</p>
+
+<h2>What Hush does</h2>
+<p>Hush lives in your menu bar and plays ambient noise to help you focus. It has two sounds:</p>
+<ul>
+<li><strong>Brown</strong>: a deep, low rumble, with an adjustable low-pass cutoff from 20 to 500 Hz.</li>
+<li><strong>Speech Blocker</strong>: noise shaped to mask nearby voices.</li>
+</ul>
+<p>All sound is generated on your Mac in real time. Hush works fully offline.</p>
+
+<h2>How to use it</h2>
+<table>
+<tr><th>Action</th><th>Result</th></tr>
+<tr><td>Right-click the menu bar icon</td><td>Turn sound on or off</td></tr>
+<tr><td>Left-click the menu bar icon</td><td>Open the controls: noise type, volume, cutoff, and appearance</td></tr>
+<tr><td>Space (controls open)</td><td>Play or pause</td></tr>
+<tr><td>⌘Q (controls open)</td><td>Quit Hush</td></tr>
+</table>
+<p>Sound fades in and out smoothly. Hush remembers your noise type, volume, and appearance between launches.</p>
+
+<h2>Common questions</h2>
+
+<h3>I don't hear anything</h3>
+<ul>
+<li>Right-click the menu bar icon to make sure sound is on, or open the controls and check the volume slider.</li>
+<li>Check your Mac's volume and that it isn't muted.</li>
+<li>Check the output device in System Settings &gt; Sound. If you switched headphones or speakers while Hush was playing, turn Hush off and on again.</li>
+<li>Brown noise with a very low cutoff is quiet on laptop speakers, which reproduce little bass. Raise the cutoff or use headphones.</li>
+</ul>
+
+<h3>The Hush icon is missing from the menu bar</h3>
+<ul>
+<li>Make sure Hush is running: open it from Applications or Launchpad. Hush has no Dock icon, only the menu bar icon.</li>
+<li>On a crowded menu bar, macOS hides icons behind the notch or when space runs out. Quit a few other menu bar apps, or use a menu bar manager, to reveal it.</li>
+<li>On newer macOS versions, check that Hush is allowed in System Settings &gt; Menu Bar.</li>
+</ul>
+
+<h3>How do I reset my settings?</h3>
+<p>Quit Hush, open Terminal, and run:</p>
+<p><code>defaults delete com.rahulprabhakar.hush</code></p>
+<p>Then open Hush again. It starts with Brown noise, half volume, and dark appearance.</p>
+
+<h3>Does Hush collect any data?</h3>
+<p>No. See the <a href="privacy.html">Privacy Policy</a>.</p>
+
+<h2>Get help</h2>
+<p>Report a problem or ask a question by opening an issue at <a href="https://github.com/RahulPrabha/Hush/issues">github.com/RahulPrabha/Hush/issues</a>. Include your macOS version and Hush version (select Hush in Applications and choose File &gt; Get Info).</p>
+<footer><a href="index.html">Hush</a> · <a href="privacy.html">Privacy Policy</a> · <a href="support.html">Support</a></footer>
+</main>
+</body>
+</html>
