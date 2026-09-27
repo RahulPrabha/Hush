@@ -29,6 +29,8 @@ Now that I can build my own tools, I made exactly what I wanted: a small menu ba
 
 You can verify this yourself: the full source is in this repo, and you can build it directly from Xcode.
 
+See the [Privacy Policy](https://rahulprabha.github.io/Hush/privacy.html). For help, see the [Support page](https://rahulprabha.github.io/Hush/support.html).
+
 ## Usage
 
 | Action | Result |
