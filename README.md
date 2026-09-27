@@ -77,6 +77,9 @@ xcodebuild -exportArchive -archivePath build/Hush.xcarchive \
 Bump `CURRENT_PROJECT_VERSION` for every upload and `MARKETING_VERSION` for
 every release.
 
+The App Store screenshots and the script that builds them live in
+[`docs/app-store/`](docs/app-store/).
+
 ## Changelog
 
 ### v1.3.0 (unreleased)
