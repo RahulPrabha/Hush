@@ -57,11 +57,11 @@ struct ContentView: View {
                     VStack(spacing: 14) {
                         ParamHero(sub: "Brown noise",
                                   label: "Low-pass cutoff",
-                                  value: "\(Int(audioEngine.brownCutoff))",
+                                  value: Int(audioEngine.brownCutoff).formatted(),
                                   unit: "Hz")
                         SliderRow(
-                            leading: { Text("20").sliderEndStyle() },
-                            trailing: { Text("500").sliderEndStyle() },
+                            leading: { Text(20.formatted()).sliderEndStyle() },
+                            trailing: { Text(500.formatted()).sliderEndStyle() },
                             value: Binding(
                                 get: { Double(audioEngine.brownCutoff) },
                                 set: { audioEngine.brownCutoff = Float($0) }
@@ -76,7 +76,7 @@ struct ContentView: View {
 
             ParamHero(sub: "Master",
                       label: "Volume",
-                      value: "\(Int(audioEngine.volume * 100))",
+                      value: Int(audioEngine.volume * 100).formatted(),
                       unit: "%")
             SliderRow(
                 leading: {
@@ -113,6 +113,7 @@ struct ContentView: View {
                 Text("Right-click the menu bar icon to toggle")
                     .font(.system(size: 11.5))
                     .foregroundColor(c.textMute)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 2)
@@ -157,7 +158,7 @@ private struct HeaderView: View {
     var body: some View {
         let c = pal(cs == .dark)
         HStack {
-            Text("Hush")
+            Text(verbatim: "Hush")
                 .font(.system(size: 22, weight: .semibold))
                 .tracking(-0.33)
                 .foregroundColor(c.text)
@@ -187,7 +188,7 @@ private struct StatusPill: View {
                     .frame(width: 6, height: 6)
             }
             .frame(width: 14, height: 14)
-            Text(isPlaying ? "Playing" : "Stopped")
+            (isPlaying ? Text("Playing") : Text("Stopped"))
                 .font(.system(size: 11, weight: .medium))
                 .tracking(0.11)
                 .foregroundColor(isPlaying ? c.text : c.textMute)
@@ -227,7 +228,8 @@ private struct NoiseSection: View {
     var body: some View {
         let c = pal(cs == .dark)
         VStack(alignment: .leading, spacing: 4) {
-            Text("NOISE TYPE")
+            Text("Noise Type")
+                .textCase(.uppercase)
                 .font(.system(size: 10.5, weight: .semibold))
                 .tracking(1.26)
                 .foregroundColor(c.textDim)
@@ -261,7 +263,7 @@ private struct NoiseRow: View {
         HStack(spacing: 10) {
             RadioMark(selected: selected)
                 .frame(width: 16, height: 16)
-            Text(type.rawValue)
+            Text(type.displayName)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(c.text)
             Spacer(minLength: 8)
@@ -353,8 +355,8 @@ private struct Spectrum: View {
 // MARK: - Param hero numerals
 
 private struct ParamHero: View {
-    let sub: String
-    let label: String
+    let sub: LocalizedStringKey
+    let label: LocalizedStringKey
     let value: String
     let unit: String
     @Environment(\.colorScheme) private var cs
@@ -378,7 +380,7 @@ private struct ParamHero: View {
                     .tracking(-0.9)
                     .foregroundColor(c.text)
                     .monospacedDigit()
-                Text(unit)
+                Text(verbatim: unit)
                     .font(.system(size: 14, weight: .medium))
                     .tracking(0.56)
                     .foregroundColor(c.textMute)
@@ -465,7 +467,7 @@ private struct PlayButton: View {
             HStack(spacing: 8) {
                 Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 12, weight: .semibold))
-                Text(isPlaying ? "Stop" : "Play")
+                (isPlaying ? Text("Stop") : Text("Play"))
                     .font(.system(size: 14, weight: .semibold))
                     .tracking(-0.07)
             }
@@ -511,7 +513,7 @@ private struct FooterToolbar: View {
 
 private struct ToolButton: View {
     let systemName: String
-    let help: String
+    let help: LocalizedStringKey
     let action: () -> Void
     @State private var hover = false
     @Environment(\.colorScheme) private var cs

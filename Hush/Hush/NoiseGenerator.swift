@@ -2,15 +2,24 @@ import Foundation
 import AVFoundation
 
 enum NoiseType: String, CaseIterable, Identifiable {
+    // Raw values are persisted in UserDefaults; display text comes from
+    // `displayName`, so these stay English in every locale.
     case brown = "Brown"
     case speechBlocker = "Speech Blocker"
 
     var id: String { rawValue }
 
+    var displayName: String {
+        switch self {
+        case .brown: return String(localized: "Brown", comment: "Noise type name")
+        case .speechBlocker: return String(localized: "Speech Blocker", comment: "Noise type name")
+        }
+    }
+
     var description: String {
         switch self {
-        case .brown: return "Deep, rumbling"
-        case .speechBlocker: return "Masks voices"
+        case .brown: return String(localized: "Deep, rumbling", comment: "Short description of the brown noise type")
+        case .speechBlocker: return String(localized: "Masks voices", comment: "Short description of the speech blocker noise type")
         }
     }
 

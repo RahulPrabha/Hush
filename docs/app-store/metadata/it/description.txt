@@ -1,0 +1,17 @@
+Hush mette il rumore marrone e un blocca voci nella barra dei menu del tuo Mac, così il suono che ti aiuta a concentrarti è sempre a un clic di distanza. Niente schede del browser, niente streaming, nessun account.
+
+Fai clic destro sull’icona nella barra dei menu per avviare o fermare il suono. Fai clic sinistro per aprire i controlli.
+
+DUE SUONI
+• Marrone: un rumore profondo e cupo per concentrazione e calma. Regola il taglio passa-basso tra 20 e 500 Hz per renderlo più scuro o più brillante.
+• Blocca voci: un rumore modellato per coprire le conversazioni vicine.
+
+NON TI DISTURBA
+• Vive nella barra dei menu, senza icona nel Dock
+• Il suono entra ed esce in dissolvenza, senza interruzioni brusche
+• Controllo del volume con un valore grande e ben leggibile
+• Aspetto chiaro e scuro
+• Ricorda suono, volume e aspetto
+
+PRIVATO PER SCELTA
+Hush funziona completamente offline. Non effettua connessioni di rete e non raccoglie dati. Niente analisi, niente file audio: ogni suono viene generato in tempo reale sul tuo Mac.

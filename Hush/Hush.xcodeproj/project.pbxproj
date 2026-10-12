@@ -13,6 +13,8 @@
 		AAA00004 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013 /* NoiseGenerator.swift */; };
 		AAA00006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAA00015 /* Assets.xcassets */; };
 		AAA00007 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AAA00016 /* PrivacyInfo.xcprivacy */; };
+		AAA00008 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AAA00018 /* Localizable.xcstrings */; };
+		AAA00009 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AAA00019 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +25,8 @@
 		AAA00015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAA00016 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AAA00017 /* Hush.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hush.entitlements; sourceTree = "<group>"; };
+		AAA00018 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		AAA00019 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAA00020 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -55,6 +59,8 @@
 				AAA00015 /* Assets.xcassets */,
 				AAA00016 /* PrivacyInfo.xcprivacy */,
 				AAA00017 /* Hush.entitlements */,
+				AAA00018 /* Localizable.xcstrings */,
+				AAA00019 /* InfoPlist.xcstrings */,
 			);
 			path = Hush;
 			sourceTree = "<group>";
@@ -109,6 +115,14 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				es,
+				fr,
+				it,
+				ja,
+				ko,
+				"pt-BR",
+				"zh-Hans",
 			);
 			mainGroup = AAA00040;
 			productRefGroup = AAA00042 /* Products */;
@@ -127,6 +141,8 @@
 			files = (
 				AAA00006 /* Assets.xcassets in Resources */,
 				AAA00007 /* PrivacyInfo.xcprivacy in Resources */,
+				AAA00008 /* Localizable.xcstrings in Resources */,
+				AAA00009 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

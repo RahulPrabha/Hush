@@ -1,0 +1,17 @@
+O Hush coloca ruído marrom e um bloqueador de voz na barra de menus do seu Mac, para que o som que ajuda você a se concentrar esteja sempre a um clique. Sem aba do navegador, sem streaming, sem conta.
+
+Clique com o botão direito no ícone da barra de menus para ligar ou desligar o som. Clique com o botão esquerdo para abrir os controles.
+
+DOIS SONS
+• Marrom: um ruído grave e profundo para foco e calma. Ajuste o corte passa-baixa entre 20 e 500 Hz para deixá-lo mais escuro ou mais brilhante.
+• Bloqueador de voz: ruído moldado para mascarar conversas por perto.
+
+SEM ATRAPALHAR
+• Fica na barra de menus, sem ícone no Dock
+• O som entra e sai suavemente, sem cortes bruscos
+• Controle de volume com um número grande e fácil de ler
+• Aparência clara e escura
+• Lembra seu som, volume e aparência
+
+PRIVADO POR PRINCÍPIO
+O Hush funciona totalmente offline. Ele não faz conexões de rede e não coleta dados. Não há análises nem arquivos de áudio: cada som é gerado em tempo real no seu Mac.

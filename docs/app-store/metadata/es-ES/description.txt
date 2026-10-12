@@ -1,0 +1,17 @@
+Hush pone ruido marrón y un bloqueador de voz en la barra de menús de tu Mac, para que el sonido que te ayuda a concentrarte esté siempre a un clic. Sin pestañas del navegador, sin streaming, sin cuenta.
+
+Haz clic derecho en el icono de la barra de menús para activar o detener el sonido. Haz clic izquierdo para abrir los controles.
+
+DOS SONIDOS
+• Marrón: un ruido profundo y grave para concentrarte y relajarte. Ajusta su corte de paso bajo entre 20 y 500 Hz para hacerlo más oscuro o más brillante.
+• Bloqueador de voz: ruido diseñado para enmascarar las conversaciones cercanas.
+
+NO SE INTERPONE EN TU CAMINO
+• Vive en la barra de menús, sin icono en el Dock
+• Aparece y desaparece de forma gradual, sin cortes bruscos
+• Control de volumen con una cifra grande y fácil de leer
+• Aspecto claro y oscuro
+• Recuerda tu sonido, volumen y aspecto
+
+PRIVADO POR DISEÑO
+Hush funciona totalmente sin conexión. No se conecta a la red ni recopila datos. No hay analíticas ni archivos de audio: cada sonido se genera en tiempo real en tu Mac.
