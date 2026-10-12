@@ -30,6 +30,7 @@ struct ContentView: View {
     // Whether the popover is on screen. Drives the bar animation so it
     // doesn't burn CPU re-rendering at 30 fps while nobody can see it.
     @ObservedObject var popoverState: PopoverState
+    @ObservedObject var launchAtLogin: LaunchAtLogin
     // Reports the content's laid-out height each frame so the popover window
     // can track SwiftUI's height animation instead of snapping to the target.
     var onHeightChange: ((CGFloat) -> Void)? = nil
@@ -120,6 +121,10 @@ struct ContentView: View {
 
             Hairline()
 
+            LaunchAtLoginRow(launchAtLogin: launchAtLogin)
+
+            Hairline()
+
             FooterToolbar(isDarkMode: $isDarkMode)
         }
         .padding(EdgeInsets(top: 18, leading: 18, bottom: 12, trailing: 18))
@@ -145,6 +150,11 @@ struct ContentView: View {
         }
         .onChange(of: audioEngine.noiseType) { newType in
             selectedNoiseType = newType.rawValue
+        }
+        .onChange(of: popoverState.isShown) { shown in
+            // The login item can be changed in System Settings while Hush
+            // runs, so re-read it each time the popover opens.
+            if shown { launchAtLogin.refresh() }
         }
     }
 }
@@ -486,6 +496,52 @@ private struct PlayButton: View {
         }
         .buttonStyle(.plain)
         .onHover { hover = $0 }
+    }
+}
+
+// MARK: - Launch at login
+
+private struct LaunchAtLoginRow: View {
+    @ObservedObject var launchAtLogin: LaunchAtLogin
+    @Environment(\.colorScheme) private var cs
+
+    var body: some View {
+        let c = pal(cs == .dark)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("Launch at login")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(c.text)
+                Spacer()
+                Toggle("Launch at login", isOn: Binding(
+                    get: { launchAtLogin.state.isOn },
+                    set: { launchAtLogin.setEnabled($0) }
+                ))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.mini)
+            }
+
+            if launchAtLogin.state == .requiresApproval {
+                HStack(spacing: 4) {
+                    Text("Allow Hush in Login Items to finish.")
+                        .foregroundColor(c.textMute)
+                    Button("Open System Settings") {
+                        launchAtLogin.openLoginItemsSettings()
+                    }
+                    .buttonStyle(.link)
+                }
+                .font(.system(size: 11.5))
+            }
+
+            if let error = launchAtLogin.error {
+                Text("Couldn't change login item: \(error)")
+                    .font(.system(size: 11.5))
+                    .foregroundColor(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.horizontal, 2)
     }
 }
 
