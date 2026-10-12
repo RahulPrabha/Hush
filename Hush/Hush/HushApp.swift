@@ -23,6 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var popover: NSPopover!
     let audioEngine = AudioEngine()
     let popoverState = PopoverState()
+    let launchAtLogin = LaunchAtLogin()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create status item
@@ -47,6 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let hosting = NSHostingController(rootView: ContentView(
             audioEngine: audioEngine,
             popoverState: popoverState,
+            launchAtLogin: launchAtLogin,
             onHeightChange: { [weak self] h in self?.contentHeightChanged(to: h) }
         ))
         // Don't let the hosting controller push its preferred size to the

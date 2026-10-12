@@ -13,6 +13,9 @@
 		AAA00004 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013 /* NoiseGenerator.swift */; };
 		AAA00006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAA00015 /* Assets.xcassets */; };
 		AAA00007 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AAA00016 /* PrivacyInfo.xcprivacy */; };
+		AAA00008 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00018 /* LaunchAtLogin.swift */; };
+		AAA00009 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00018 /* LaunchAtLogin.swift */; };
+		AAA0000A /* LaunchAtLoginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00019 /* LaunchAtLoginTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,11 +26,21 @@
 		AAA00015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAA00016 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AAA00017 /* Hush.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hush.entitlements; sourceTree = "<group>"; };
+		AAA00018 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
+		AAA00019 /* LaunchAtLoginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginTests.swift; sourceTree = "<group>"; };
 		AAA00020 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAA00021 /* HushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		AAA00030 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAA00031 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -41,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA00041 /* Hush */,
+				AAA00043 /* HushTests */,
 				AAA00042 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,6 +66,7 @@
 				AAA00011 /* ContentView.swift */,
 				AAA00012 /* AudioEngine.swift */,
 				AAA00013 /* NoiseGenerator.swift */,
+				AAA00018 /* LaunchAtLogin.swift */,
 				AAA00015 /* Assets.xcassets */,
 				AAA00016 /* PrivacyInfo.xcprivacy */,
 				AAA00017 /* Hush.entitlements */,
@@ -63,8 +78,17 @@
 			isa = PBXGroup;
 			children = (
 				AAA00020 /* Hush.app */,
+				AAA00021 /* HushTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AAA00043 /* HushTests */ = {
+			isa = PBXGroup;
+			children = (
+				AAA00019 /* LaunchAtLoginTests.swift */,
+			);
+			path = HushTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -87,6 +111,22 @@
 			productReference = AAA00020 /* Hush.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AAA00053 /* HushTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAA00061 /* Build configuration list for PBXNativeTarget "HushTests" */;
+			buildPhases = (
+				AAA00054 /* Sources */,
+				AAA00031 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HushTests;
+			productName = HushTests;
+			productReference = AAA00021 /* HushTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -98,6 +138,9 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					AAA00050 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					AAA00053 = {
 						CreatedOnToolsVersion = 15.0;
 					};
 				};
@@ -116,6 +159,7 @@
 			projectRoot = "";
 			targets = (
 				AAA00050 /* Hush */,
+				AAA00053 /* HushTests */,
 			);
 		};
 /* End PBXProject section */
@@ -141,6 +185,16 @@
 				AAA00002 /* ContentView.swift in Sources */,
 				AAA00003 /* AudioEngine.swift in Sources */,
 				AAA00004 /* NoiseGenerator.swift in Sources */,
+				AAA00008 /* LaunchAtLogin.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAA00054 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00009 /* LaunchAtLogin.swift in Sources */,
+				AAA0000A /* LaunchAtLoginTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +384,32 @@
 			};
 			name = Release;
 		};
+		AAA00084 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AAA00085 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -347,6 +427,15 @@
 			buildConfigurations = (
 				AAA00080 /* Debug */,
 				AAA00081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAA00061 /* Build configuration list for PBXNativeTarget "HushTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAA00084 /* Debug */,
+				AAA00085 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

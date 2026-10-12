@@ -15,6 +15,7 @@ A macOS menu bar app for ambient noise. Brown noise and a speech blocker — one
 - **Brown noise low-pass cutoff** — adjustable filter from 20–500 Hz
 - **Smooth start and stop** — audio fades in and out instead of cutting abruptly
 - **Light and dark mode** — toggle from the popover footer
+- **Launch at login** — optional, off by default; switch it on in the popover
 - **Remembers your settings** — last used noise type, volume, and appearance persist across launches
 
 ## Why I built this
@@ -59,6 +60,12 @@ universal release binary from the command line:
 
 The result is written to `dist/Hush.app`.
 
+Run the unit tests with:
+
+```sh
+xcodebuild test -project Hush/Hush.xcodeproj -scheme Hush
+```
+
 ### Mac App Store archive
 
 The app is sandboxed (`Hush/Hush/Hush.entitlements`) and ships a privacy
@@ -86,6 +93,7 @@ The App Store screenshots and the script that builds them live in
 
 - Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store
 - The app now reports its real version (1.3.0) instead of 1.0
+- Added a Launch at login setting to the popover
 
 ### v1.2.0
 
