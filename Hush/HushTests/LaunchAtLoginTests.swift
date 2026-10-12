@@ -128,6 +128,18 @@ final class LaunchAtLoginTests: XCTestCase {
         XCTAssertEqual(model.state, .on)
     }
 
+    func testRefreshClearsStaleError() {
+        let service = FakeLoginItemService(status: .notRegistered)
+        service.registerError = FakeError()
+        let model = LaunchAtLogin(service: service)
+        model.setEnabled(true)
+        XCTAssertNotNil(model.error)
+        service.status = .enabled
+        model.refresh()
+        XCTAssertEqual(model.state, .on)
+        XCTAssertNil(model.error)
+    }
+
     func testRefreshPicksUpExternalChange() {
         let service = FakeLoginItemService(status: .enabled)
         let model = LaunchAtLogin(service: service)
