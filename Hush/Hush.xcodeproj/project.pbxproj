@@ -14,7 +14,6 @@
 		AAA00006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAA00015 /* Assets.xcassets */; };
 		AAA00007 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AAA00016 /* PrivacyInfo.xcprivacy */; };
 		AAA00008 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AAA00018 /* Localizable.xcstrings */; };
-		AAA00009 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AAA00019 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,7 +25,6 @@
 		AAA00016 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AAA00017 /* Hush.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hush.entitlements; sourceTree = "<group>"; };
 		AAA00018 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		AAA00019 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAA00020 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -60,7 +58,6 @@
 				AAA00016 /* PrivacyInfo.xcprivacy */,
 				AAA00017 /* Hush.entitlements */,
 				AAA00018 /* Localizable.xcstrings */,
-				AAA00019 /* InfoPlist.xcstrings */,
 			);
 			path = Hush;
 			sourceTree = "<group>";
@@ -142,7 +139,6 @@
 				AAA00006 /* Assets.xcassets in Resources */,
 				AAA00007 /* PrivacyInfo.xcprivacy in Resources */,
 				AAA00008 /* Localizable.xcstrings in Resources */,
-				AAA00009 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

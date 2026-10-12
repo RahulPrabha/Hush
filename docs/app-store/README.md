@@ -35,9 +35,3 @@ The non-English text is machine-translated.
 
 `python3 scripts/check_localizations.py` checks that every locale has every
 field within App Store Connect's length limits.
-
-## Localized UI
-
-`localized-ui/` has renders of the controls panel in German (`de.png`) and
-Japanese (`ja.png`), used to check that longer and CJK translations fit. The
-App Store screenshots above are English only.

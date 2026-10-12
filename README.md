@@ -84,9 +84,8 @@ listing text live in [`docs/app-store/`](docs/app-store/).
 
 Hush is localized into Spanish, French, German, Japanese, Simplified Chinese,
 Portuguese (Brazil), Korean, and Italian (machine-translated). UI strings live
-in the String Catalog `Hush/Hush/Localizable.xcstrings` and Info.plist strings
-in `Hush/Hush/InfoPlist.xcstrings`. When you add a user-facing string, add its
-translations too, then run:
+in the String Catalog `Hush/Hush/Localizable.xcstrings`. When you add a
+user-facing string, add its translations too, then run:
 
 ```sh
 python3 scripts/check_localizations.py

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Check that Hush's translations are complete.
 
-- Every key in the app's String Catalogs (Localizable.xcstrings and
-  InfoPlist.xcstrings) has a translated, non-empty value for every supported
-  language, and any value whose English text names "Hush" keeps that name.
+- Every key in the app's String Catalog (Localizable.xcstrings) has a
+  translated, non-empty value for every supported language, and any value whose English text names "Hush" keeps that name.
 - Every App Store listing locale under docs/app-store/metadata/ has all the
   listing fields, within App Store Connect's length limits.
 
@@ -17,7 +16,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CATALOGS = [
     ROOT / "Hush/Hush/Localizable.xcstrings",
-    ROOT / "Hush/Hush/InfoPlist.xcstrings",
 ]
 LANGUAGES = ["de", "es", "fr", "it", "ja", "ko", "pt-BR", "zh-Hans"]
 
