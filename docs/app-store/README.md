@@ -22,3 +22,16 @@ The PNGs are written next to the script.
 
 The raw full-screen captures are intentionally not committed: they show
 whatever was behind the panel.
+
+## Listing text
+
+`metadata/<locale>/` holds the App Store Connect listing text for each
+localization, one file per field: `name`, `subtitle`, `promotional_text`,
+`description`, `keywords`, and `release_notes` (What's New). The folder names
+are App Store Connect locale codes (`en-US`, `de-DE`, `es-ES`, `fr-FR`, `it`,
+`ja`, `ko`, `pt-BR`, `zh-Hans`) and follow fastlane's `deliver` layout. Paste
+each file into the matching field, or upload the folder with `fastlane deliver`.
+The non-English text is machine-translated.
+
+`python3 scripts/check_localizations.py` checks that every locale has every
+field within App Store Connect's length limits.

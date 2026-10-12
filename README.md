@@ -77,8 +77,22 @@ xcodebuild -exportArchive -archivePath build/Hush.xcarchive \
 Bump `CURRENT_PROJECT_VERSION` for every upload and `MARKETING_VERSION` for
 every release.
 
-The App Store screenshots and the script that builds them live in
-[`docs/app-store/`](docs/app-store/).
+The App Store screenshots, the script that builds them, and the localized
+listing text live in [`docs/app-store/`](docs/app-store/).
+
+### Localization
+
+Hush is localized into Spanish, French, German, Japanese, Simplified Chinese,
+Portuguese (Brazil), Korean, and Italian (machine-translated). UI strings live
+in the String Catalog `Hush/Hush/Localizable.xcstrings`. When you add a
+user-facing string, add its translations too, then run:
+
+```sh
+python3 scripts/check_localizations.py
+```
+
+It fails if any catalog key or App Store listing field is missing a language.
+CI runs the same check on every pull request.
 
 ## Changelog
 
@@ -86,6 +100,7 @@ The App Store screenshots and the script that builds them live in
 
 - Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store
 - The app now reports its real version (1.3.0) instead of 1.0
+- Localized into Spanish, French, German, Japanese, Simplified Chinese, Portuguese (Brazil), Korean, and Italian
 
 ### v1.2.0
 

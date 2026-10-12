@@ -1,0 +1,17 @@
+Hush place du bruit brun et un anti-voix dans la barre des menus de votre Mac : le son qui vous aide à vous concentrer est toujours à un clic. Pas d’onglet de navigateur, pas de streaming, pas de compte.
+
+Faites un clic droit sur l’icône de la barre des menus pour lancer ou arrêter le son. Faites un clic gauche pour ouvrir les commandes.
+
+DEUX SONS
+• Brun : un bruit grave et sourd pour la concentration et le calme. Réglez sa fréquence de coupure passe-bas entre 20 et 500 Hz pour le rendre plus sombre ou plus clair.
+• Anti-voix : un bruit conçu pour masquer les conversations alentour.
+
+DISCRET
+• Se loge dans la barre des menus, sans icône dans le Dock
+• Le son apparaît et disparaît en fondu, sans coupure brusque
+• Réglage du volume avec un grand affichage lisible
+• Apparence claire et sombre
+• Mémorise votre son, votre volume et votre apparence
+
+CONFIDENTIEL PAR NATURE
+Hush fonctionne entièrement hors ligne. Il n’établit aucune connexion réseau et ne collecte aucune donnée. Pas d’analyses, pas de fichiers audio : chaque son est généré en temps réel sur votre Mac.

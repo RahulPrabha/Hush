@@ -1,0 +1,17 @@
+Hush bringt braunes Rauschen und einen Sprachblocker in die Menüleiste deines Mac. So ist der Klang, der dir beim Konzentrieren hilft, immer nur einen Klick entfernt. Kein Browser-Tab, kein Streaming, kein Konto.
+
+Rechtsklicke auf das Symbol in der Menüleiste, um den Klang zu starten oder zu stoppen. Mit einem Linksklick öffnest du die Steuerung.
+
+ZWEI KLÄNGE
+• Braun: ein tiefes, grollendes Rauschen für Fokus und Ruhe. Stelle die Tiefpassgrenze zwischen 20 und 500 Hz ein, um es dunkler oder heller zu machen.
+• Sprachblocker: ein Rauschen, das Gespräche in der Nähe überdeckt.
+
+BLEIBT IM HINTERGRUND
+• Wohnt in der Menüleiste, ohne Dock-Symbol
+• Blendet sanft ein und aus, statt abrupt abzubrechen
+• Lautstärkeregler mit großer, gut lesbarer Anzeige
+• Helles und dunkles Erscheinungsbild
+• Merkt sich Klang, Lautstärke und Erscheinungsbild
+
+PRIVAT VON GRUND AUF
+Hush funktioniert komplett offline. Die App baut keine Netzwerkverbindungen auf und sammelt keine Daten. Es gibt keine Analysen und keine Audiodateien: Jeder Klang wird in Echtzeit auf deinem Mac erzeugt.

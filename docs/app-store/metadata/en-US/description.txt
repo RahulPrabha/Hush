@@ -1,0 +1,17 @@
+Hush puts brown noise and a speech blocker in your Mac's menu bar, so focus sound is always one click away. No browser tab, no streaming, no account.
+
+Right-click the menu bar icon to start or stop the sound. Left-click to open the controls.
+
+TWO SOUNDS
+• Brown: a deep, rumbling noise for focus and calm. Set its low-pass cutoff anywhere from 20 to 500 Hz to make it darker or brighter.
+• Speech Blocker: noise shaped to mask nearby conversation.
+
+STAYS OUT OF YOUR WAY
+• Lives in the menu bar, with no Dock icon
+• Fades in and out smoothly instead of cutting off
+• Volume control with a large, easy-to-read readout
+• Light and dark appearance
+• Remembers your sound, volume, and appearance
+
+PRIVATE BY DESIGN
+Hush is fully offline. It makes no network connections and collects no data. There are no analytics and no audio files: every sound is generated in real time on your Mac.
