@@ -39,7 +39,8 @@ enum LaunchAtLoginState: Equatable {
 /// the App Store sandbox without a helper app or LaunchAgent plist.
 final class LaunchAtLogin: ObservableObject {
     @Published private(set) var state: LaunchAtLoginState
-    /// The last register/unregister failure, cleared on the next success.
+    /// The last register/unregister failure, cleared whenever the system
+    /// state is re-read.
     @Published private(set) var error: String?
 
     private let service: LoginItemService
@@ -53,20 +54,22 @@ final class LaunchAtLogin: ObservableObject {
     /// at any time.
     func refresh() {
         state = LaunchAtLoginState(service.status)
+        error = nil
     }
 
     func setEnabled(_ enabled: Bool) {
+        var failure: String?
         do {
             if enabled {
                 try service.register()
             } else if LaunchAtLoginState(service.status) != .off {
                 try service.unregister()
             }
-            error = nil
         } catch {
-            self.error = error.localizedDescription
+            failure = error.localizedDescription
         }
         refresh()
+        error = failure
     }
 
     func openLoginItemsSettings() {
