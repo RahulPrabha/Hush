@@ -2,7 +2,7 @@
 
 # Hush
 
-A macOS menu bar app for ambient noise. Brown noise and a speech blocker — one right-click away, no browser tab required.
+A macOS menu bar app for ambient noise, plus an iPhone app that shares the same sound engine. Brown noise and a speech blocker — on the Mac, one right-click away, no browser tab required.
 
 ## Features
 
@@ -26,7 +26,7 @@ Now that I can build my own tools, I made exactly what I wanted: a small menu ba
 
 ## Privacy
 
-**Hush is fully offline.** It requires no network connection and makes none. There are no analytics, no telemetry, no servers, and no audio files — all sounds are generated algorithmically in real time using signal processing (brown noise via leaky integration and a low-pass filter, speech blocker via pink noise from Paul Kellet's method shaped by a 10-band EQ). Nothing leaves your Mac.
+**Hush is fully offline.** It requires no network connection and makes none. There are no analytics, no telemetry, no servers, and no audio files — all sounds are generated algorithmically in real time using signal processing (brown noise via leaky integration and a low-pass filter, speech blocker via pink noise from Paul Kellet's method shaped by a 10-band EQ). Nothing leaves your device.
 
 You can verify this yourself: the full source is in this repo, and you can build it directly from Xcode.
 
@@ -51,8 +51,9 @@ Requires macOS 13+. Apple notarized, so it just opens.
 
 ## Building from source
 
-Open `Hush/Hush.xcodeproj` in Xcode and run the `Hush` scheme, or build a
-universal release binary from the command line:
+Open `Hush/Hush.xcodeproj` in Xcode and run the `Hush` scheme (Mac) or the
+`Hush iOS` scheme (iPhone simulator or device). Or build a universal Mac
+release binary from the command line:
 
 ```sh
 ./build.sh

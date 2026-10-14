@@ -17,6 +17,16 @@
 		AAA0000B /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0001A /* LaunchAtLogin.swift */; };
 		AAA0000C /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0001A /* LaunchAtLogin.swift */; };
 		AAA0000D /* LaunchAtLoginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0001B /* LaunchAtLoginTests.swift */; };
+		AAA00201 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00012 /* AudioEngine.swift */; };
+		AAA00202 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013 /* NoiseGenerator.swift */; };
+		AAA00203 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAA00015 /* Assets.xcassets */; };
+		AAA00204 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AAA00016 /* PrivacyInfo.xcprivacy */; };
+		AAA00205 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AAA00018 /* Localizable.xcstrings */; };
+		AAA00206 /* HushApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00210 /* HushApp.swift */; };
+		AAA00207 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00211 /* ContentView.swift */; };
+		AAA00208 /* PlaybackSessionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00213 /* PlaybackSessionPolicy.swift */; };
+		AAA00209 /* PlaybackSessionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00213 /* PlaybackSessionPolicy.swift */; };
+		AAA0020A /* PlaybackSessionPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00214 /* PlaybackSessionPolicyTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +42,12 @@
 		AAA0001B /* LaunchAtLoginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginTests.swift; sourceTree = "<group>"; };
 		AAA00020 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAA00021 /* HushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAA00210 /* HushApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HushApp.swift; sourceTree = "<group>"; };
+		AAA00211 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AAA00212 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAA00213 /* PlaybackSessionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSessionPolicy.swift; sourceTree = "<group>"; };
+		AAA00214 /* PlaybackSessionPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSessionPolicyTests.swift; sourceTree = "<group>"; };
+		AAA00220 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +65,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AAA00230 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -56,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA00041 /* Hush */,
+				AAA00240 /* Hush-iOS */,
 				AAA00043 /* HushTests */,
 				AAA00042 /* Products */,
 			);
@@ -68,6 +92,7 @@
 				AAA00011 /* ContentView.swift */,
 				AAA00012 /* AudioEngine.swift */,
 				AAA00013 /* NoiseGenerator.swift */,
+				AAA00213 /* PlaybackSessionPolicy.swift */,
 				AAA0001A /* LaunchAtLogin.swift */,
 				AAA00015 /* Assets.xcassets */,
 				AAA00016 /* PrivacyInfo.xcprivacy */,
@@ -81,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA00020 /* Hush.app */,
+				AAA00220 /* Hush.app */,
 				AAA00021 /* HushTests.xctest */,
 			);
 			name = Products;
@@ -90,8 +116,19 @@
 			isa = PBXGroup;
 			children = (
 				AAA0001B /* LaunchAtLoginTests.swift */,
+				AAA00214 /* PlaybackSessionPolicyTests.swift */,
 			);
 			path = HushTests;
+			sourceTree = "<group>";
+		};
+		AAA00240 /* Hush-iOS */ = {
+			isa = PBXGroup;
+			children = (
+				AAA00210 /* HushApp.swift */,
+				AAA00211 /* ContentView.swift */,
+				AAA00212 /* Info.plist */,
+			);
+			path = "Hush-iOS";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -130,6 +167,23 @@
 			productReference = AAA00021 /* HushTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		AAA00250 /* Hush iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAA00260 /* Build configuration list for PBXNativeTarget "Hush iOS" */;
+			buildPhases = (
+				AAA00251 /* Sources */,
+				AAA00230 /* Frameworks */,
+				AAA00252 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Hush iOS";
+			productName = Hush;
+			productReference = AAA00220 /* Hush.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -144,6 +198,9 @@
 						CreatedOnToolsVersion = 15.0;
 					};
 					AAA00053 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					AAA00250 = {
 						CreatedOnToolsVersion = 15.0;
 					};
 				};
@@ -170,6 +227,7 @@
 			projectRoot = "";
 			targets = (
 				AAA00050 /* Hush */,
+				AAA00250 /* Hush iOS */,
 				AAA00053 /* HushTests */,
 			);
 		};
@@ -183,6 +241,16 @@
 				AAA00006 /* Assets.xcassets in Resources */,
 				AAA00007 /* PrivacyInfo.xcprivacy in Resources */,
 				AAA00008 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAA00252 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00203 /* Assets.xcassets in Resources */,
+				AAA00204 /* PrivacyInfo.xcprivacy in Resources */,
+				AAA00205 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,6 +275,20 @@
 			files = (
 				AAA0000C /* LaunchAtLogin.swift in Sources */,
 				AAA0000D /* LaunchAtLoginTests.swift in Sources */,
+				AAA00209 /* PlaybackSessionPolicy.swift in Sources */,
+				AAA0020A /* PlaybackSessionPolicyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAA00251 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00206 /* HushApp.swift in Sources */,
+				AAA00207 /* ContentView.swift in Sources */,
+				AAA00201 /* AudioEngine.swift in Sources */,
+				AAA00202 /* NoiseGenerator.swift in Sources */,
+				AAA00208 /* PlaybackSessionPolicy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,7 +352,6 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -327,7 +408,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -360,6 +440,8 @@
 				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -391,6 +473,8 @@
 				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -405,6 +489,8 @@
 				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -418,7 +504,80 @@
 				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AAA00282 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VDQFT44K74;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Hush-iOS/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Hush;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025-2026 Rahul Prabhakar";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush.ios;
+				PRODUCT_NAME = Hush;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AAA00283 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VDQFT44K74;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Hush-iOS/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Hush;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025-2026 Rahul Prabhakar";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush.ios;
+				PRODUCT_NAME = Hush;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -448,6 +607,15 @@
 			buildConfigurations = (
 				AAA00084 /* Debug */,
 				AAA00085 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAA00260 /* Build configuration list for PBXNativeTarget "Hush iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAA00282 /* Debug */,
+				AAA00283 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
