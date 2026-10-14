@@ -104,10 +104,10 @@ CI runs the same check on every pull request.
 
 ## Changelog
 
-### v1.3.0 (unreleased)
+### v1.4.0 (unreleased)
 
 - Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store
-- The app now reports its real version (1.3.0) instead of 1.0
+- The app now reports its real version (1.4.0) instead of 1.0
 - Localized into Spanish, French, German, Japanese, Simplified Chinese, Portuguese (Brazil), Korean, and Italian
 - Added a Launch at login setting to the popover
 
