@@ -124,6 +124,9 @@ class AudioEngine: ObservableObject {
         shouldBePlaying = true
         if audioEngine == nil {
             startEngine()
+        } else {
+            isPlaying = true
+            updateNowPlaying()
         }
         #else
         guard !shouldBePlaying else { return }
