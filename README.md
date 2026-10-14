@@ -32,7 +32,7 @@ You can verify this yourself: the full source is in this repo, and you can build
 
 See the [Privacy Policy](https://rahulprabha.github.io/Hush/privacy.html). For help, see the [Support page](https://rahulprabha.github.io/Hush/support.html).
 
-## Usage
+## Usage (Mac)
 
 | Action | Result |
 |---|---|
