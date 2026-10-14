@@ -1,1 +1,1 @@
-Hush est désormais disponible en espagnol, français, allemand, japonais, chinois simplifié, portugais (Brésil), coréen et italien.
+Hush est désormais disponible en espagnol, français, allemand, japonais, chinois simplifié, portugais (Brésil), coréen et italien. Nouveau réglage « Ouvrir à la connexion » (désactivé par défaut) : Hush se lance quand vous ouvrez une session sur votre Mac.
