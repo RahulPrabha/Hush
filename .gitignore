@@ -17,3 +17,6 @@ dist/
 
 # Claude
 .claude/
+
+# App Store screenshot panel renders (see docs/app-store/README.md)
+captures/

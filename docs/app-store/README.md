@@ -1,27 +1,35 @@
 # Mac App Store screenshots
 
-Screenshots for the Hush 1.3.0 Mac App Store listing, 2880x1800 each:
+Screenshots for the Hush 1.4.0 Mac App Store listing, 2880x1800 each:
 
 - `1-brown.png`: "Brown noise, one click away."
 - `2-speech.png`: "Tune out the voices."
-- `3-light.png`: "Offline. Private."
+- `3-light.png`: "Offline. Private." (light theme)
+- `4-languages.png`: "Speaks your language." Lists the 9 languages the app is
+  available in, with the panel shown in Japanese. The captions stay English.
 
-Each one is the Hush controls panel cut out of a full-screen capture and placed
-on a brown gradient with a headline, built by `make_screenshots.py`.
+Each one is the Hush controls panel on a brown gradient with a headline, built by
+`make_screenshots.py`. Every panel includes the Launch at login row with its
+themed switch.
 
 ## Regenerating
 
-1. Open the Hush panel and take a full-screen capture (Shift-Cmd-3) for each shot.
-2. In `make_screenshots.py`, set each capture's path and the panel's pixel box
-   `(left, top, right, bottom)` in `SHOTS`. Capture paths are relative to the
-   directory you run the script from.
-3. `pip install pillow`
-4. `python3 docs/app-store/make_screenshots.py` (macOS; it uses the SF system font).
+The panel images are drawn offscreen from the app's own SwiftUI view, so nothing
+is ever captured from the screen and no raw captures need to be kept.
 
-The PNGs are written next to the script.
+1. `docs/app-store/render_panels.sh <dir>` compiles `ContentView.swift` and its
+   model files with `render_panel.swift`, then writes `brown.png`, `speech.png`,
+   `light.png` and `ja.png` (the panel only) into `<dir>`. Use a directory
+   outside the repo, or `captures/`, which is git-ignored. It needs Xcode's
+   command line tools and takes the strings from `Localizable.xcstrings`, so
+   the panel always matches the current app. The state to show (noise type,
+   theme, login switch, language) is set at the bottom of the script.
+2. `pip install pillow`
+3. `python3 docs/app-store/make_screenshots.py <dir>` (macOS; it uses system
+   fonts, including CJK ones for the language list).
 
-The raw full-screen captures are intentionally not committed: they show
-whatever was behind the panel.
+The PNGs are written next to the script. Per-locale screenshot sets (each
+listing language with its own captions) are not made yet.
 
 ## Listing text
 
