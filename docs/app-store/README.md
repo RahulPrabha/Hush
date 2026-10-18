@@ -35,3 +35,8 @@ The non-English text is machine-translated.
 
 `python3 scripts/check_localizations.py` checks that every locale has every
 field within App Store Connect's length limits.
+
+## App Review notes
+
+`review_notes.md` has the text for App Store Connect's "Notes for review" field and a
+guideline 2.4.5 / 5.1.1 check for the current release.
