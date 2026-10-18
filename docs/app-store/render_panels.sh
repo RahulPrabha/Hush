@@ -21,7 +21,8 @@ cp "$HERE/render_panel.swift" "$WORK/main.swift"
 swiftc -O -o "$APP/Contents/MacOS/render_panel" \
   "$WORK/main.swift" \
   "$SRC/ContentView.swift" "$SRC/AudioEngine.swift" \
-  "$SRC/NoiseGenerator.swift" "$SRC/LaunchAtLogin.swift"
+  "$SRC/NoiseGenerator.swift" "$SRC/LaunchAtLogin.swift" \
+  "$SRC/PlaybackCoordinator.swift"
 
 # The app's String Catalog, compiled to .lproj folders so the views localize.
 xcrun xcstringstool compile --output-directory "$APP/Contents/Resources" "$SRC/Localizable.xcstrings"

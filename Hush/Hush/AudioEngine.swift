@@ -68,7 +68,11 @@ class AudioEngine: ObservableObject {
     private let fadeSpeed: Float = 0.0005
 
     /// Tracks user intent separately from engine state and derives `isPlaying`.
-    private lazy var playback = PlaybackCoordinator(backend: OutputBackend(owner: self))
+    private lazy var playback = PlaybackCoordinator(backend: backendOverride ?? OutputBackend(owner: self))
+
+    /// Replaces the AVAudioEngine-backed output, e.g. so the screenshot
+    /// renderer can show the playing state without making any sound.
+    private let backendOverride: PlaybackBackend?
 
     /// Starts and stops the AVAudioEngine on behalf of `playback`.
     private final class OutputBackend: PlaybackBackend {
@@ -89,7 +93,8 @@ class AudioEngine: ObservableObject {
         }
     }
 
-    init() {
+    init(backend: PlaybackBackend? = nil) {
+        backendOverride = backend
         playback.onChange = { [weak self] isPlaying in
             guard let self else { return }
             self.isPlaying = isPlaying
