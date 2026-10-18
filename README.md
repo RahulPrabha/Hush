@@ -104,7 +104,7 @@ CI runs the same check on every pull request.
 
 ## Changelog
 
-### v1.4.0 (unreleased)
+### v1.4.0
 
 - Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store
 - The app now reports its real version (1.4.0) instead of 1.0
