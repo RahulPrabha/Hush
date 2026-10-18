@@ -518,8 +518,7 @@ private struct LaunchAtLoginRow: View {
                     set: { launchAtLogin.setEnabled($0) }
                 ))
                 .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.mini)
+                .toggleStyle(ThemedSwitchStyle())
             }
 
             if launchAtLogin.state == .requiresApproval {
@@ -542,6 +541,34 @@ private struct LaunchAtLoginRow: View {
             }
         }
         .padding(.horizontal, 2)
+    }
+}
+
+/// Switch drawn from the app palette; the system switch can only show the
+/// system accent (blue).
+private struct ThemedSwitchStyle: ToggleStyle {
+    @Environment(\.colorScheme) private var cs
+
+    func makeBody(configuration: Configuration) -> some View {
+        let c = pal(cs == .dark)
+        let on = configuration.isOn
+        Button {
+            configuration.isOn.toggle()
+        } label: {
+            Capsule()
+                .fill(on ? c.accent : c.hairline2)
+                .frame(width: 26, height: 15)
+                .overlay(alignment: on ? .trailing : .leading) {
+                    Circle()
+                        .fill(on ? c.accentText : c.accent)
+                        .padding(2)
+                }
+                .animation(.easeOut(duration: 0.12), value: on)
+        }
+        .buttonStyle(.plain)
+        .accessibilityRepresentation {
+            Toggle(isOn: configuration.$isOn) { configuration.label }
+        }
     }
 }
 
