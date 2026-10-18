@@ -104,6 +104,10 @@ CI runs the same check on every pull request.
 
 ## Changelog
 
+### v1.4.1 (unreleased)
+
+- Fixed the menu bar icon showing "playing" while no audio was playing after right-clicking it several times quickly
+
 ### v1.4.0
 
 - Enabled the App Sandbox and added a privacy manifest in preparation for the Mac App Store

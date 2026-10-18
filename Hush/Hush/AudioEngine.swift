@@ -6,7 +6,9 @@ import MediaPlayer
 #endif
 
 class AudioEngine: ObservableObject {
-    @Published var isPlaying = false
+    /// Mirrors `PlaybackCoordinator.isPlaying`, which is derived from whether
+    /// the audio output is really running. Never assign it directly.
+    @Published private(set) var isPlaying = false
     @Published var volume: Float = 0.5 {
         didSet {
             updateVolume()
@@ -64,9 +66,42 @@ class AudioEngine: ObservableObject {
 
     private var fadeLevel: Float = 0
     private let fadeSpeed: Float = 0.0005
-    private var shouldBePlaying = false  // Track user intent separately from engine state
 
-    init() {
+    /// Tracks user intent separately from engine state and derives `isPlaying`.
+    private lazy var playback = PlaybackCoordinator(backend: backendOverride ?? OutputBackend(owner: self))
+
+    /// Replaces the AVAudioEngine-backed output, e.g. so the screenshot
+    /// renderer can show the playing state without making any sound.
+    private let backendOverride: PlaybackBackend?
+
+    /// Starts and stops the AVAudioEngine on behalf of `playback`.
+    private final class OutputBackend: PlaybackBackend {
+        private weak var owner: AudioEngine?
+
+        init(owner: AudioEngine) {
+            self.owner = owner
+        }
+
+        var isRunning: Bool { owner?.audioEngine?.isRunning ?? false }
+
+        func start() throws {
+            try owner?.startOutput()
+        }
+
+        func stop() {
+            owner?.stopOutput()
+        }
+    }
+
+    init(backend: PlaybackBackend? = nil) {
+        backendOverride = backend
+        playback.onChange = { [weak self] isPlaying in
+            guard let self else { return }
+            self.isPlaying = isPlaying
+            #if os(iOS)
+            self.updateNowPlaying()
+            #endif
+        }
         setupNotifications()
         #if os(iOS)
         setupAudioSession()
@@ -89,148 +124,100 @@ class AudioEngine: ObservableObject {
         // Audio configuration changed (e.g., AirPods switched to mic mode, device changed)
         // Restart the engine to adapt to new sample rate
         DispatchQueue.main.async { [weak self] in
-            guard let self = self, self.shouldBePlaying else { return }
+            guard let self = self, self.playback.wantsPlayback else { return }
             #if os(iOS)
             guard self.isPlaying else { return }
             #endif
-            self.restartAudioEngine()
-        }
-    }
-
-    private func restartAudioEngine() {
-        // Clean up old engine
-        audioEngine?.stop()
-        audioEngine = nil
-        sourceNode = nil
-        fadeLevel = 0
-
-        // Restart after a brief delay to let the system settle
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self = self, self.shouldBePlaying else { return }
-            self.startEngine()
+            self.playback.restart()
         }
     }
 
     func toggle() {
-        if isPlaying {
-            stop()
-        } else {
-            play()
-        }
+        playback.toggle()
     }
 
     func play() {
-        #if os(iOS)
-        shouldBePlaying = true
-        if audioEngine == nil {
-            startEngine()
-        } else {
-            isPlaying = true
-            updateNowPlaying()
-        }
-        #else
-        guard !shouldBePlaying else { return }
-        shouldBePlaying = true
-        startEngine()
-        #endif
-    }
-
-    private func startEngine() {
-        guard shouldBePlaying else { return }
-
-        do {
-            #if os(iOS)
-            try activateSession()
-            #endif
-
-            let engine = AVAudioEngine()
-
-            // Use the hardware's actual sample rate to avoid pitch issues when audio config changes
-            let hardwareSampleRate = engine.outputNode.outputFormat(forBus: 0).sampleRate
-            let sampleRate = hardwareSampleRate > 0 ? hardwareSampleRate : 44100
-
-            // Update noise generators with current sample rate
-            noiseGeneratorL.sampleRate = Float(sampleRate)
-            noiseGeneratorR.sampleRate = Float(sampleRate)
-
-            let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
-
-            let source = AVAudioSourceNode { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
-                guard let self = self else { return noErr }
-
-                if self.needsGeneratorReset {
-                    self.needsGeneratorReset = false
-                    self.noiseGeneratorL.reset()
-                    self.noiseGeneratorR.reset()
-                }
-
-                let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
-
-                // Get left and right channel buffers
-                let leftBuf = ablPointer.count > 0 ? ablPointer[0].mData?.assumingMemoryBound(to: Float.self) : nil
-                let rightBuf = ablPointer.count > 1 ? ablPointer[1].mData?.assumingMemoryBound(to: Float.self) : nil
-
-                for frame in 0..<Int(frameCount) {
-                    // Fade in/out for smooth transitions
-                    if self.isPlaying && self.fadeLevel < 1 {
-                        self.fadeLevel = min(1, self.fadeLevel + self.fadeSpeed)
-                    } else if !self.isPlaying && self.fadeLevel > 0 {
-                        self.fadeLevel = max(0, self.fadeLevel - self.fadeSpeed)
-                    }
-
-                    // Generate independent samples for true stereo
-                    let sampleL = self.noiseGeneratorL.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
-                    let sampleR = self.noiseGeneratorR.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
-
-                    let gain = self.volume * self.fadeLevel
-                    leftBuf?[frame] = sampleL * gain
-                    rightBuf?[frame] = sampleR * gain
-                }
-
-                return noErr
-            }
-
-            engine.attach(source)
-            engine.connect(source, to: engine.mainMixerNode, format: format)
-
-            noiseGeneratorL.reset()
-            noiseGeneratorR.reset()
-
-            try engine.start()
-
-            self.audioEngine = engine
-            self.sourceNode = source
-            self.isPlaying = true
-            #if os(iOS)
-            updateNowPlaying()
-            #endif
-
-        } catch {
-            print("Failed to start audio engine: \(error)")
-        }
+        playback.play()
     }
 
     func stop() {
-        shouldBePlaying = false
-        isPlaying = false
+        playback.stop()
+    }
+
+    private func startOutput() throws {
         #if os(iOS)
-        updateNowPlaying()
+        try activateSession()
         #endif
 
-        // Allow fade out before stopping
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self else { return }
-            #if os(iOS)
-            guard !self.shouldBePlaying else { return }
-            #endif
-            self.audioEngine?.stop()
-            self.audioEngine = nil
-            self.sourceNode = nil
-            self.fadeLevel = 0
-            #if os(iOS)
-            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            #endif
+        let engine = AVAudioEngine()
+
+        // Use the hardware's actual sample rate to avoid pitch issues when audio config changes
+        let hardwareSampleRate = engine.outputNode.outputFormat(forBus: 0).sampleRate
+        let sampleRate = hardwareSampleRate > 0 ? hardwareSampleRate : 44100
+
+        // Update noise generators with current sample rate
+        noiseGeneratorL.sampleRate = Float(sampleRate)
+        noiseGeneratorR.sampleRate = Float(sampleRate)
+
+        let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
+
+        let source = AVAudioSourceNode { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
+            guard let self = self else { return noErr }
+
+            if self.needsGeneratorReset {
+                self.needsGeneratorReset = false
+                self.noiseGeneratorL.reset()
+                self.noiseGeneratorR.reset()
+            }
+
+            let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
+
+            // Get left and right channel buffers
+            let leftBuf = ablPointer.count > 0 ? ablPointer[0].mData?.assumingMemoryBound(to: Float.self) : nil
+            let rightBuf = ablPointer.count > 1 ? ablPointer[1].mData?.assumingMemoryBound(to: Float.self) : nil
+
+            for frame in 0..<Int(frameCount) {
+                // Fade in/out for smooth transitions
+                if self.isPlaying && self.fadeLevel < 1 {
+                    self.fadeLevel = min(1, self.fadeLevel + self.fadeSpeed)
+                } else if !self.isPlaying && self.fadeLevel > 0 {
+                    self.fadeLevel = max(0, self.fadeLevel - self.fadeSpeed)
+                }
+
+                // Generate independent samples for true stereo
+                let sampleL = self.noiseGeneratorL.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
+                let sampleR = self.noiseGeneratorR.generateSample(type: self.noiseType, useCustomLevels: self.useCustomEQ)
+
+                let gain = self.volume * self.fadeLevel
+                leftBuf?[frame] = sampleL * gain
+                rightBuf?[frame] = sampleR * gain
+            }
+
+            return noErr
         }
+
+        engine.attach(source)
+        engine.connect(source, to: engine.mainMixerNode, format: format)
+
+        noiseGeneratorL.reset()
+        noiseGeneratorR.reset()
+
+        try engine.start()
+
+        self.audioEngine = engine
+        self.sourceNode = source
+    }
+
+    private func stopOutput() {
+        audioEngine?.stop()
+        audioEngine = nil
+        sourceNode = nil
+        fadeLevel = 0
+        #if os(iOS)
+        if !playback.wantsPlayback {
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        }
+        #endif
     }
 
     private func updateVolume() {
@@ -308,25 +295,13 @@ class AudioEngine: ObservableObject {
             case .none:
                 break
             case .pauseKeepingIntent:
-                self.pauseKeepingIntent()
+                self.playback.suspend()
             case .resumeIfIntended:
-                guard self.shouldBePlaying else { return }
-                if self.audioEngine == nil {
-                    self.startEngine()
-                }
+                self.playback.resumeIfIntended()
             case .stop:
                 self.stop()
             }
         }
-    }
-
-    private func pauseKeepingIntent() {
-        isPlaying = false
-        audioEngine?.stop()
-        audioEngine = nil
-        sourceNode = nil
-        fadeLevel = 0
-        updateNowPlaying()
     }
 
     @objc private func handleInterruption(_ notification: Notification) {

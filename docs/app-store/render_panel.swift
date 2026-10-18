@@ -21,6 +21,14 @@ private struct FakeLoginItem: LoginItemService {
     func unregister() throws {}
 }
 
+/// An output that reports running without producing sound, so `play()` shows
+/// the playing state without starting real audio.
+private final class SilentBackend: PlaybackBackend {
+    private(set) var isRunning = false
+    func start() throws { isRunning = true }
+    func stop() { isRunning = false }
+}
+
 let args = CommandLine.arguments
 guard args.count >= 5 else {
     FileHandle.standardError.write(Data("usage: render_panel <out.png> <noise> <dark|light> <on|off>\n".utf8))
@@ -33,8 +41,8 @@ defaults.set(noise, forKey: "selectedNoiseType")
 defaults.set(0.5, forKey: "savedVolume")
 defaults.set(scheme == "dark", forKey: "isDarkMode")
 
-let engine = AudioEngine()
-engine.isPlaying = true   // shows the "Playing" pill and the live spectrum shape
+let engine = AudioEngine(backend: SilentBackend())
+engine.play()   // shows the "Playing" pill and the live spectrum shape
 let root = ContentView(
     audioEngine: engine,
     popoverState: PopoverState(),
