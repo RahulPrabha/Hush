@@ -68,7 +68,9 @@ class AudioEngine: ObservableObject {
     private let fadeSpeed: Float = 0.0005
 
     /// Tracks user intent separately from engine state and derives `isPlaying`.
-    private lazy var playback = PlaybackCoordinator(backend: backendOverride ?? OutputBackend(owner: self))
+    /// Readable so the command line tool's handler drives the same coordinator
+    /// the status item does.
+    private(set) lazy var playback = PlaybackCoordinator(backend: backendOverride ?? OutputBackend(owner: self))
 
     /// Replaces the AVAudioEngine-backed output, e.g. so the screenshot
     /// renderer can show the playing state without making any sound.
