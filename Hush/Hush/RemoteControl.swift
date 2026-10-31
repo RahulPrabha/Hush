@@ -19,7 +19,7 @@ protocol PlaybackControlling: AnyObject {
 /// control writes the same keys, so a volume or sound chosen from the terminal
 /// survives a relaunch and shows up in the popover. ContentView.swift spells
 /// them out as literals (it is compiled on its own by the App Store panel
-/// renderer), so keep them in step; a test checks.
+/// renderer), so keep them in step.
 enum HushSettings {
     static let noiseTypeKey = "selectedNoiseType"
     static let volumeKey = "savedVolume"

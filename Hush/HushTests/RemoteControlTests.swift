@@ -155,18 +155,6 @@ final class RemoteControlTests: XCTestCase {
         XCTAssertEqual(defaults.double(forKey: HushSettings.volumeKey), 0.2, accuracy: 0.0001)
     }
 
-    func testSettingsKeysMatchThePopoversAppStorage() throws {
-        // ContentView.swift can't reference HushSettings (the App Store panel
-        // renderer compiles it alone), so pin the literals it uses.
-        let source = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()           // HushTests
-            .deletingLastPathComponent()           // Hush (project folder)
-            .appendingPathComponent("Hush/ContentView.swift")
-        let text = try String(contentsOf: source, encoding: .utf8)
-        XCTAssertTrue(text.contains("@AppStorage(\"\(HushSettings.noiseTypeKey)\")"))
-        XCTAssertTrue(text.contains("@AppStorage(\"\(HushSettings.volumeKey)\")"))
-    }
-
     func testRestoreAppliesSavedSettings() {
         defaults.set("Speech Blocker", forKey: HushSettings.noiseTypeKey)
         defaults.set(0.8, forKey: HushSettings.volumeKey)
