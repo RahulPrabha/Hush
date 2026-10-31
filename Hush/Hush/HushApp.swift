@@ -60,10 +60,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         hosting.sizingOptions = []
         popover.contentViewController = hosting
 
-        // Update icon when playing state changes
-        audioEngine.$isPlaying.sink { [weak self] isPlaying in
+        // Update icon when playing state changes. $isPlaying publishes before
+        // the value is stored, so read the settled state on the next turn:
+        // rapid toggles can't leave an older value drawn last.
+        audioEngine.$isPlaying.sink { [weak self] _ in
             DispatchQueue.main.async {
-                self?.updateIcon(isPlaying: isPlaying)
+                guard let self else { return }
+                self.updateIcon(isPlaying: self.audioEngine.isPlaying)
             }
         }.store(in: &cancellables)
     }

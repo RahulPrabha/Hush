@@ -27,6 +27,10 @@
 		AAA00208 /* PlaybackSessionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00213 /* PlaybackSessionPolicy.swift */; };
 		AAA00209 /* PlaybackSessionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00213 /* PlaybackSessionPolicy.swift */; };
 		AAA0020A /* PlaybackSessionPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00214 /* PlaybackSessionPolicyTests.swift */; };
+		AAA0020B /* PlaybackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00215 /* PlaybackCoordinator.swift */; };
+		AAA0020C /* PlaybackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00215 /* PlaybackCoordinator.swift */; };
+		AAA0020D /* PlaybackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00215 /* PlaybackCoordinator.swift */; };
+		AAA0020E /* PlaybackCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00216 /* PlaybackCoordinatorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +51,8 @@
 		AAA00212 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAA00213 /* PlaybackSessionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSessionPolicy.swift; sourceTree = "<group>"; };
 		AAA00214 /* PlaybackSessionPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSessionPolicyTests.swift; sourceTree = "<group>"; };
+		AAA00215 /* PlaybackCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackCoordinator.swift; sourceTree = "<group>"; };
+		AAA00216 /* PlaybackCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackCoordinatorTests.swift; sourceTree = "<group>"; };
 		AAA00220 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -93,6 +99,7 @@
 				AAA00012 /* AudioEngine.swift */,
 				AAA00013 /* NoiseGenerator.swift */,
 				AAA00213 /* PlaybackSessionPolicy.swift */,
+				AAA00215 /* PlaybackCoordinator.swift */,
 				AAA0001A /* LaunchAtLogin.swift */,
 				AAA00015 /* Assets.xcassets */,
 				AAA00016 /* PrivacyInfo.xcprivacy */,
@@ -117,6 +124,7 @@
 			children = (
 				AAA0001B /* LaunchAtLoginTests.swift */,
 				AAA00214 /* PlaybackSessionPolicyTests.swift */,
+				AAA00216 /* PlaybackCoordinatorTests.swift */,
 			);
 			path = HushTests;
 			sourceTree = "<group>";
@@ -266,6 +274,7 @@
 				AAA00003 /* AudioEngine.swift in Sources */,
 				AAA00004 /* NoiseGenerator.swift in Sources */,
 				AAA0000B /* LaunchAtLogin.swift in Sources */,
+				AAA0020B /* PlaybackCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +286,8 @@
 				AAA0000D /* LaunchAtLoginTests.swift in Sources */,
 				AAA00209 /* PlaybackSessionPolicy.swift in Sources */,
 				AAA0020A /* PlaybackSessionPolicyTests.swift in Sources */,
+				AAA0020C /* PlaybackCoordinator.swift in Sources */,
+				AAA0020E /* PlaybackCoordinatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +300,7 @@
 				AAA00201 /* AudioEngine.swift in Sources */,
 				AAA00202 /* NoiseGenerator.swift in Sources */,
 				AAA00208 /* PlaybackSessionPolicy.swift in Sources */,
+				AAA0020D /* PlaybackCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -422,7 +434,7 @@
 				CODE_SIGN_ENTITLEMENTS = Hush/Hush.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -437,7 +449,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -455,7 +467,7 @@
 				CODE_SIGN_ENTITLEMENTS = Hush/Hush.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -470,7 +482,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rahulprabhakar.hush;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
