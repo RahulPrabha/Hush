@@ -1,14 +1,15 @@
 import AppKit
 
-/// Delivers a command to the running Hush app (launching it when needed) as a
-/// `hush://` URL, then waits for the app's answer in the reply mailbox.
+/// Hands a command to the running Hush app (launching it when needed) by
+/// writing it into the app's own sandbox container, then waits for the app's
+/// answer there. See `CommandChannel`.
 ///
-/// This runs inside the same sandboxed executable as the app itself, so the
-/// URL goes through Launch Services like any other app's, and the mailbox is
-/// in the app's own container. No entitlements are involved.
+/// This runs inside the same sandboxed executable as the app itself, so it
+/// shares the app's container. No URL scheme, no entitlement, and nothing
+/// outside the container is involved.
 struct AppTransport: RemoteTransport {
     var appURL: URL? = AppLocation.bundleURL()
-    var mailbox: ReplyMailbox = .live
+    var channel: CommandChannel = .live
     /// How long to wait for the app to launch and answer.
     var timeout: TimeInterval = 10
 
@@ -17,34 +18,53 @@ struct AppTransport: RemoteTransport {
             return .unreachable("couldn't find Hush.app from \(CommandLine.arguments[0]).")
         }
         // Answers that arrived after an earlier invocation gave up.
-        mailbox.removeStale()
-        let token = ReplyMailbox.makeToken()
-        let url = command.url(replyToken: token)
+        channel.removeStaleReplies()
 
-        let opened = OpenResult()
-        let configuration = NSWorkspace.OpenConfiguration()
-        configuration.activates = false  // don't steal focus from the terminal
-        NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: configuration) { _, error in
-            opened.finish(error)
+        // Write the command first: an app that starts because of this call
+        // looks for waiting commands as it comes up.
+        let token = CommandChannel.makeToken()
+        do {
+            try channel.submit(command, token: token)
+        } catch {
+            return .unreachable("couldn't write a command for Hush: \(error.localizedDescription)")
+        }
+
+        let launch = LaunchResult()
+        if !Self.isRunning(appURL) {
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = false  // don't steal focus from the terminal
+            NSWorkspace.shared.openApplication(at: appURL, configuration: configuration) { _, error in
+                launch.finish(error)
+            }
         }
 
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
             // Spin the run loop so Launch Services can call back.
             RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
-            if let error = opened.error {
-                return .unreachable("couldn't open Hush at \(appURL.path): \(error.localizedDescription)")
+            if let error = launch.error {
+                channel.withdraw(token: token)
+                return .unreachable("couldn't launch Hush at \(appURL.path): \(error.localizedDescription)")
             }
-            if let response = mailbox.take(token: token) {
+            if let response = channel.takeReply(token: token) {
                 return .response(response)
             }
         }
+        // Don't let the command run later, after the caller has been told it failed.
+        channel.withdraw(token: token)
         return .unreachable("Hush didn't answer within \(Int(timeout)) seconds.")
+    }
+
+    private static func isRunning(_ appURL: URL) -> Bool {
+        let target = appURL.resolvingSymlinksInPath().path
+        return NSWorkspace.shared.runningApplications.contains {
+            $0.bundleURL?.resolvingSymlinksInPath().path == target
+        }
     }
 }
 
-/// Carries the open call's result across threads.
-private final class OpenResult {
+/// Carries the launch call's result across threads.
+private final class LaunchResult {
     private let lock = NSLock()
     private var failure: Error?
 

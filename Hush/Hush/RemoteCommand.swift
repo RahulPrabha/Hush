@@ -1,12 +1,13 @@
 import Foundation
 
-// The vocabulary shared by the `hush` command line tool and the app's
-// `hush://` URL handler. A command travels from the CLI to the running app as
-// a URL; the app answers with a `RemoteResponse`.
+// The vocabulary shared by the `hush` command line tool and the app. A command
+// travels from the CLI to the running app as a small JSON file in the app's own
+// sandbox container (see CommandChannel); the app answers with a
+// `RemoteResponse`.
 
 extension NoiseType {
     /// Stable, shell-friendly identifier used on the command line and in
-    /// `hush://` URLs: "brown", "speech-blocker".
+    /// command files: "brown", "speech-blocker".
     var cliID: String {
         rawValue.lowercased().replacingOccurrences(of: " ", with: "-")
     }
@@ -40,7 +41,7 @@ extension NoiseType {
     }
 }
 
-/// One thing the CLI (or any `hush://` URL) can ask the running app to do.
+/// One thing the `hush` tool can ask the running app to do.
 enum RemoteCommand: Equatable {
     /// Start playing, switching to the given sound first when there is one.
     case play(NoiseType?)
@@ -52,16 +53,13 @@ enum RemoteCommand: Equatable {
 }
 
 enum RemoteCommandError: Error, Equatable, LocalizedError {
-    case notAHushURL
     case unknownCommand(String)
     case unknownSound(String)
     case ambiguousSound(String)
-    case invalidVolume(String?)
+    case invalidVolume(Int?)
 
     var errorDescription: String? {
         switch self {
-        case .notAHushURL:
-            return "Not a hush:// URL."
         case .unknownCommand(let name):
             return "Unknown command '\(name)'."
         case .unknownSound(let name):
@@ -69,63 +67,27 @@ enum RemoteCommandError: Error, Equatable, LocalizedError {
         case .ambiguousSound(let name):
             return "'\(name)' matches more than one sound. Available sounds: \(NoiseType.cliIDList)."
         case .invalidVolume(let value):
-            return "Volume must be a whole number from 0 to 100 (got '\(value ?? "nothing")')."
+            return "Volume must be a whole number from 0 to 100 (got '\(value.map(String.init) ?? "nothing")')."
         }
     }
 }
 
-extension RemoteCommand {
-    static let urlScheme = "hush"
-    static let soundQueryName = "sound"
-    static let levelQueryName = "level"
-    static let replyQueryName = "reply"
-
-    static func handles(_ url: URL) -> Bool {
-        url.scheme?.lowercased() == urlScheme
+/// How a command is written to disk: `{"command":"play","sound":"brown"}`,
+/// `{"command":"volume","level":40}`, `{"command":"stop"}`. Decoding checks
+/// the values, so whatever reads a command file gets a valid command or an
+/// error it can report.
+extension RemoteCommand: Codable {
+    private struct Wire: Codable {
+        var command: String
+        var sound: String?
+        var level: Int?
     }
 
-    /// `hush://play?sound=brown`, `hush://stop`, `hush://toggle`,
-    /// `hush://status`, `hush://volume?level=40`. A `reply` token asks the app
-    /// to leave its answer in the reply mailbox.
-    func url(replyToken: String? = nil) -> URL {
-        var components = URLComponents()
-        components.scheme = Self.urlScheme
-        var items: [URLQueryItem] = []
-        switch self {
-        case .play(let sound):
-            components.host = "play"
-            if let sound { items.append(URLQueryItem(name: Self.soundQueryName, value: sound.cliID)) }
-        case .stop:
-            components.host = "stop"
-        case .toggle:
-            components.host = "toggle"
-        case .status:
-            components.host = "status"
-        case .setVolume(let level):
-            components.host = "volume"
-            items.append(URLQueryItem(name: Self.levelQueryName, value: String(level)))
-        }
-        if let replyToken { items.append(URLQueryItem(name: Self.replyQueryName, value: replyToken)) }
-        components.queryItems = items.isEmpty ? nil : items
-        return components.url!
-    }
-
-    init(url: URL) throws {
-        guard Self.handles(url),
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            throw RemoteCommandError.notAHushURL
-        }
-        // hush://play, hush:play and hush:///play all name the "play" command.
-        let name = ((components.host?.isEmpty == false ? components.host : nil) ?? components.path)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            .lowercased()
-        func value(_ query: String) -> String? {
-            components.queryItems?.first(where: { $0.name == query })?.value
-        }
-
-        switch name {
+    init(from decoder: Decoder) throws {
+        let wire = try Wire(from: decoder)
+        switch wire.command {
         case "play":
-            guard let raw = value(Self.soundQueryName) else {
+            guard let raw = wire.sound else {
                 self = .play(nil)
                 return
             }
@@ -134,21 +96,29 @@ extension RemoteCommand {
             case .unknown: throw RemoteCommandError.unknownSound(raw)
             case .ambiguous: throw RemoteCommandError.ambiguousSound(raw)
             }
-        case "stop":
-            self = .stop
-        case "toggle":
-            self = .toggle
-        case "status":
-            self = .status
+        case "stop": self = .stop
+        case "toggle": self = .toggle
+        case "status": self = .status
         case "volume":
-            let raw = value(Self.levelQueryName)
-            guard let raw, let level = Int(raw), (0...100).contains(level) else {
-                throw RemoteCommandError.invalidVolume(raw)
+            guard let level = wire.level, (0...100).contains(level) else {
+                throw RemoteCommandError.invalidVolume(wire.level)
             }
             self = .setVolume(level)
         default:
-            throw RemoteCommandError.unknownCommand(name)
+            throw RemoteCommandError.unknownCommand(wire.command)
         }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        let wire: Wire
+        switch self {
+        case .play(let sound): wire = Wire(command: "play", sound: sound?.cliID)
+        case .stop: wire = Wire(command: "stop")
+        case .toggle: wire = Wire(command: "toggle")
+        case .status: wire = Wire(command: "status")
+        case .setVolume(let level): wire = Wire(command: "volume", level: level)
+        }
+        try wire.encode(to: encoder)
     }
 }
 
