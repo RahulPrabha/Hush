@@ -44,6 +44,7 @@
 		AAA0031A /* RemoteCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00307 /* RemoteCommandTests.swift */; };
 		AAA0031B /* RemoteControlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00308 /* RemoteControlTests.swift */; };
 		AAA0031C /* HushCLITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00309 /* HushCLITests.swift */; };
+		AAA0031D /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00012 /* AudioEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -329,6 +330,7 @@
 				AAA00317 /* RemoteControl.swift in Sources */,
 				AAA00318 /* HushCLI.swift in Sources */,
 				AAA00319 /* NoiseGenerator.swift in Sources */,
+				AAA0031D /* AudioEngine.swift in Sources */,
 				AAA0031A /* RemoteCommandTests.swift in Sources */,
 				AAA0031B /* RemoteControlTests.swift in Sources */,
 				AAA0031C /* HushCLITests.swift in Sources */,

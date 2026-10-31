@@ -1,7 +1,5 @@
 import AppKit
 
-extension AudioEngine: PlaybackControlling {}
-
 /// Kept for the life of the app; `AppDelegate` itself is declared in HushApp.swift.
 private var remoteControlServer: RemoteControlServer?
 

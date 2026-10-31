@@ -1,29 +1,26 @@
+import Combine
 import XCTest
 
-final class FakeEngine: PlaybackControlling {
-    var isPlaying = false
-    var volume: Float = 0.5
-    var noiseType: NoiseType = .brown {
-        didSet { noiseTypeAssignments += 1 }
-    }
-    /// When set, `play()` leaves the engine stopped, like a missing output device.
-    var startFails = false
-    private(set) var noiseTypeAssignments = 0
-    private(set) var playCalls = 0
+struct StubOutputError: Error {}
+
+/// Stands in for the audio output, so the real `AudioEngine` and
+/// `PlaybackCoordinator` run without making a sound.
+final class StubOutputBackend: PlaybackBackend {
+    private(set) var isRunning = false
+    /// When set, `start()` fails, like a missing output device.
+    var failsToStart = false
+    private(set) var startCalls = 0
     private(set) var stopCalls = 0
 
-    func play() {
-        playCalls += 1
-        if !startFails { isPlaying = true }
+    func start() throws {
+        startCalls += 1
+        if failsToStart { throw StubOutputError() }
+        isRunning = true
     }
 
     func stop() {
         stopCalls += 1
-        isPlaying = false
-    }
-
-    func toggle() {
-        if isPlaying { stop() } else { play() }
+        isRunning = false
     }
 }
 
@@ -33,7 +30,9 @@ class RemoteControlTestCase: XCTestCase {
     var suiteName: String!
     var directory: URL!
     var channel: CommandChannel!
-    var engine: FakeEngine!
+    var backend: StubOutputBackend!
+    var engine: AudioEngine!
+    var playback: PlaybackCoordinator { engine.playback }
 
     override func setUpWithError() throws {
         suiteName = "HushTests.\(UUID().uuidString)"
@@ -41,7 +40,8 @@ class RemoteControlTestCase: XCTestCase {
         directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("HushTests-\(UUID().uuidString)", isDirectory: true)
         channel = CommandChannel(directory: directory)
-        engine = FakeEngine()
+        backend = StubOutputBackend()
+        engine = AudioEngine(backend: backend)
     }
 
     override func tearDownWithError() throws {
@@ -76,7 +76,8 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
 
     func testPlayStartsPlayback() {
         XCTAssertEqual(handler.perform(.play(nil)), .success(state(playing: true)))
-        XCTAssertTrue(engine.isPlaying)
+        XCTAssertTrue(backend.isRunning)
+        XCTAssertTrue(engine.isPlaying, "the menu bar icon reads this")
     }
 
     func testPlayWithSoundSwitchesSound() {
@@ -92,9 +93,14 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
     }
 
     func testPlayWithTheCurrentSoundLeavesTheGeneratorAlone() {
-        _ = handler.perform(.play(.brown))
         // Assigning the same sound would reset the noise generator mid-playback.
-        XCTAssertEqual(engine.noiseTypeAssignments, 0)
+        var assignments = 0
+        let observation = engine.$noiseType.dropFirst().sink { _ in assignments += 1 }
+        _ = handler.perform(.play(.brown))
+        _ = handler.perform(.play(.speechBlocker))
+        _ = handler.perform(.play(.speechBlocker))
+        XCTAssertEqual(assignments, 1)
+        observation.cancel()
     }
 
     func testPlayIsIdempotentFromTheCallersPointOfView() {
@@ -106,6 +112,25 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
         _ = handler.perform(.play(nil))
         XCTAssertEqual(handler.perform(.stop), .success(state(playing: false)))
         XCTAssertFalse(engine.isPlaying)
+    }
+
+    func testStopThenPlayRightAwayKeepsPlaying() {
+        // The CLI can send these a few milliseconds apart. The coordinator
+        // must not let the first stop's delayed teardown silence the second play.
+        _ = handler.perform(.play(nil))
+        _ = handler.perform(.stop)
+        XCTAssertEqual(handler.perform(.play(nil)), .success(state(playing: true)))
+
+        _ = waitUntil(PlaybackCoordinator.fadeOutDelay + 0.3) { false }
+
+        XCTAssertTrue(backend.isRunning, "the stale teardown stopped the new output")
+        XCTAssertEqual(handler.perform(.status), .success(state(playing: true)))
+    }
+
+    func testStopTearsTheOutputDownAfterTheFadeOut() {
+        _ = handler.perform(.play(nil))
+        _ = handler.perform(.stop)
+        XCTAssertTrue(waitUntil { !backend.isRunning })
     }
 
     func testStopWhenAlreadyStoppedSucceeds() {
@@ -120,13 +145,13 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
     func testStatusReportsWithoutChangingAnything() {
         engine.noiseType = .speechBlocker
         engine.volume = 0.25
-        let before = (engine.playCalls, engine.stopCalls)
+        let before = (backend.startCalls, backend.stopCalls)
         XCTAssertEqual(
             handler.perform(.status),
             .success(state(playing: false, sound: "speech-blocker", volume: 25))
         )
-        XCTAssertEqual(engine.playCalls, before.0)
-        XCTAssertEqual(engine.stopCalls, before.1)
+        XCTAssertEqual(backend.startCalls, before.0)
+        XCTAssertEqual(backend.stopCalls, before.1)
     }
 
     func testSetVolumeAppliesPercentAsGain() {
@@ -144,7 +169,7 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
     // MARK: Failure
 
     func testPlayThatCannotStartReportsFailureWithState() {
-        engine.startFails = true
+        backend.failsToStart = true
         let response = handler.perform(.play(nil))
         XCTAssertFalse(response.ok)
         XCTAssertEqual(response.error, "Hush couldn't start audio output.")
@@ -152,14 +177,21 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
     }
 
     func testToggleThatCannotStartReportsFailure() {
-        engine.startFails = true
+        backend.failsToStart = true
         XCTAssertFalse(handler.perform(.toggle).ok)
     }
 
     func testToggleThatStopsNeverFails() {
         _ = handler.perform(.play(nil))
-        engine.startFails = true
+        backend.failsToStart = true
         XCTAssertTrue(handler.perform(.toggle).ok)
+    }
+
+    func testAFailedStartDoesNotLeaveTheEngineReportingPlaying() {
+        backend.failsToStart = true
+        _ = handler.perform(.play(nil))
+        XCTAssertFalse(engine.isPlaying)
+        XCTAssertTrue(playback.wantsPlayback, "the user's request stays on record")
     }
 
     // MARK: Persistence
@@ -183,7 +215,6 @@ final class RemoteControlHandlerTests: RemoteControlTestCase {
         HushSettings.restore(into: engine, from: defaults)
         XCTAssertEqual(engine.noiseType, .brown)
         XCTAssertEqual(engine.volume, 0.5)
-        XCTAssertEqual(engine.noiseTypeAssignments, 0)
     }
 
     func testRestoreIgnoresRemovedSoundsAndClampsVolume() {
@@ -329,7 +360,7 @@ final class RemoteControlServerTests: RemoteControlTestCase {
 
         let reply = try XCTUnwrap(awaitReply("TOKEN-0001"), "the server never answered")
         XCTAssertEqual(reply, .success(state(playing: true, sound: "speech-blocker")))
-        XCTAssertTrue(engine.isPlaying)
+        XCTAssertTrue(backend.isRunning)
     }
 
     func testRunsACommandThatWasWaitingWhenTheAppStarted() throws {
@@ -364,7 +395,7 @@ final class RemoteControlServerTests: RemoteControlTestCase {
     }
 
     func testReportsAnEngineThatCannotStart() throws {
-        engine.startFails = true
+        backend.failsToStart = true
         server.start()
         try channel.submit(.play(nil), token: "TOKEN-0001")
 

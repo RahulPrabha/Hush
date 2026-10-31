@@ -4,18 +4,6 @@ import Foundation
 // left for it, applies them to the audio engine, and leaves the answers where
 // the tool can pick them up.
 
-/// The slice of `AudioEngine` the remote control needs, so tests can drive the
-/// handler with a fake instead of real audio output.
-protocol PlaybackControlling: AnyObject {
-    var isPlaying: Bool { get }
-    /// Linear gain, 0...1.
-    var volume: Float { get set }
-    var noiseType: NoiseType { get set }
-    func play()
-    func stop()
-    func toggle()
-}
-
 /// The preferences the popover persists with `@AppStorage`. The remote
 /// control writes the same keys, so a volume or sound chosen from the terminal
 /// survives a relaunch and shows up in the popover. ContentView.swift spells
@@ -28,7 +16,7 @@ enum HushSettings {
     /// Applies the saved sound and volume. The popover only does this when it
     /// first appears, which can be long after launch; the remote control
     /// needs the saved values from the first command on.
-    static func restore(into engine: PlaybackControlling, from defaults: UserDefaults = .standard) {
+    static func restore(into engine: AudioEngine, from defaults: UserDefaults = .standard) {
         if let raw = defaults.string(forKey: noiseTypeKey),
            let type = NoiseType(rawValue: raw),
            engine.noiseType != type {
@@ -174,25 +162,31 @@ struct CommandChannel {
     }
 }
 
-/// Applies commands to the audio engine.
+/// Applies commands. Playback goes through the engine's `PlaybackCoordinator`,
+/// the same object the menu bar icon reads, so a command can never leave the
+/// icon disagreeing with the audio, and it gets the coordinator's handling of a
+/// `stop` followed straight away by a `play`. Sound and volume are the
+/// engine's own settings.
 struct RemoteControlHandler {
-    let engine: PlaybackControlling
+    let engine: AudioEngine
     var defaults: UserDefaults = .standard
+
+    private var playback: PlaybackCoordinator { engine.playback }
 
     func perform(_ command: RemoteCommand) -> RemoteResponse {
         switch command {
         case .play(let sound):
             if let sound { select(sound) }
-            engine.play()
-            if !engine.isPlaying { return startFailure() }
+            playback.play()
+            if !playback.isPlaying { return startFailure() }
 
         case .stop:
-            engine.stop()
+            playback.stop()
 
         case .toggle:
-            let wasPlaying = engine.isPlaying
-            engine.toggle()
-            if !wasPlaying && !engine.isPlaying { return startFailure() }
+            let wasPlaying = playback.isPlaying
+            playback.toggle()
+            if !wasPlaying && !playback.isPlaying { return startFailure() }
 
         case .status:
             break
@@ -217,7 +211,7 @@ struct RemoteControlHandler {
 
     private func snapshot() -> PlaybackSnapshot {
         PlaybackSnapshot(
-            playing: engine.isPlaying,
+            playing: playback.isPlaying,
             sound: engine.noiseType.cliID,
             volume: Int((engine.volume * 100).rounded())
         )
@@ -234,7 +228,7 @@ final class RemoteControlServer {
     private var source: DispatchSourceFileSystemObject?
 
     init(
-        engine: PlaybackControlling,
+        engine: AudioEngine,
         channel: CommandChannel = .live,
         defaults: UserDefaults = .standard,
         queue: DispatchQueue = .main
