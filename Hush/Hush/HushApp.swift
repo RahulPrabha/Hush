@@ -2,7 +2,8 @@ import SwiftUI
 import AppKit
 import Combine
 
-@main
+// The entry point is main.swift: it starts as the `hush` command line tool
+// when invoked that way, and otherwise calls `HushApp.main()`.
 struct HushApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 

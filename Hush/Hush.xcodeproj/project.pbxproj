@@ -31,6 +31,19 @@
 		AAA0020C /* PlaybackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00215 /* PlaybackCoordinator.swift */; };
 		AAA0020D /* PlaybackCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00215 /* PlaybackCoordinator.swift */; };
 		AAA0020E /* PlaybackCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00216 /* PlaybackCoordinatorTests.swift */; };
+		AAA00310 /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00300 /* RemoteCommand.swift */; };
+		AAA00311 /* RemoteControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00301 /* RemoteControl.swift */; };
+		AAA00312 /* HushCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00302 /* HushCLI.swift */; };
+		AAA00313 /* AppTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00303 /* AppTransport.swift */; };
+		AAA00314 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00304 /* main.swift */; };
+		AAA00315 /* AppDelegate+RemoteControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00305 /* AppDelegate+RemoteControl.swift */; };
+		AAA00316 /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00300 /* RemoteCommand.swift */; };
+		AAA00317 /* RemoteControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00301 /* RemoteControl.swift */; };
+		AAA00318 /* HushCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00302 /* HushCLI.swift */; };
+		AAA00319 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013 /* NoiseGenerator.swift */; };
+		AAA0031A /* RemoteCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00307 /* RemoteCommandTests.swift */; };
+		AAA0031B /* RemoteControlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00308 /* RemoteControlTests.swift */; };
+		AAA0031C /* HushCLITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00309 /* HushCLITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +67,16 @@
 		AAA00215 /* PlaybackCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackCoordinator.swift; sourceTree = "<group>"; };
 		AAA00216 /* PlaybackCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackCoordinatorTests.swift; sourceTree = "<group>"; };
 		AAA00220 /* Hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAA00300 /* RemoteCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
+		AAA00301 /* RemoteControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteControl.swift; sourceTree = "<group>"; };
+		AAA00302 /* HushCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HushCLI.swift; sourceTree = "<group>"; };
+		AAA00303 /* AppTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTransport.swift; sourceTree = "<group>"; };
+		AAA00304 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		AAA00305 /* AppDelegate+RemoteControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+RemoteControl.swift"; sourceTree = "<group>"; };
+		AAA00306 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAA00307 /* RemoteCommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommandTests.swift; sourceTree = "<group>"; };
+		AAA00308 /* RemoteControlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteControlTests.swift; sourceTree = "<group>"; };
+		AAA00309 /* HushCLITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HushCLITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +124,13 @@
 				AAA00213 /* PlaybackSessionPolicy.swift */,
 				AAA00215 /* PlaybackCoordinator.swift */,
 				AAA0001A /* LaunchAtLogin.swift */,
+				AAA00300 /* RemoteCommand.swift */,
+				AAA00301 /* RemoteControl.swift */,
+				AAA00302 /* HushCLI.swift */,
+				AAA00303 /* AppTransport.swift */,
+				AAA00304 /* main.swift */,
+				AAA00305 /* AppDelegate+RemoteControl.swift */,
+				AAA00306 /* Info.plist */,
 				AAA00015 /* Assets.xcassets */,
 				AAA00016 /* PrivacyInfo.xcprivacy */,
 				AAA00017 /* Hush.entitlements */,
@@ -125,6 +155,9 @@
 				AAA0001B /* LaunchAtLoginTests.swift */,
 				AAA00214 /* PlaybackSessionPolicyTests.swift */,
 				AAA00216 /* PlaybackCoordinatorTests.swift */,
+				AAA00307 /* RemoteCommandTests.swift */,
+				AAA00308 /* RemoteControlTests.swift */,
+				AAA00309 /* HushCLITests.swift */,
 			);
 			path = HushTests;
 			sourceTree = "<group>";
@@ -275,6 +308,12 @@
 				AAA00004 /* NoiseGenerator.swift in Sources */,
 				AAA0000B /* LaunchAtLogin.swift in Sources */,
 				AAA0020B /* PlaybackCoordinator.swift in Sources */,
+				AAA00310 /* RemoteCommand.swift in Sources */,
+				AAA00311 /* RemoteControl.swift in Sources */,
+				AAA00312 /* HushCLI.swift in Sources */,
+				AAA00313 /* AppTransport.swift in Sources */,
+				AAA00314 /* main.swift in Sources */,
+				AAA00315 /* AppDelegate+RemoteControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +327,13 @@
 				AAA0020A /* PlaybackSessionPolicyTests.swift in Sources */,
 				AAA0020C /* PlaybackCoordinator.swift in Sources */,
 				AAA0020E /* PlaybackCoordinatorTests.swift in Sources */,
+				AAA00316 /* RemoteCommand.swift in Sources */,
+				AAA00317 /* RemoteControl.swift in Sources */,
+				AAA00318 /* HushCLI.swift in Sources */,
+				AAA00319 /* NoiseGenerator.swift in Sources */,
+				AAA0031A /* RemoteCommandTests.swift in Sources */,
+				AAA0031B /* RemoteControlTests.swift in Sources */,
+				AAA0031C /* HushCLITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,7 +486,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Hush/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -473,7 +519,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Hush/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSUIElement = YES;

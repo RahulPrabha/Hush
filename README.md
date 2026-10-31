@@ -16,6 +16,7 @@ A macOS menu bar app for ambient noise, plus an iPhone app that shares the same 
 - **Smooth start and stop** — audio fades in and out instead of cutting abruptly
 - **Light and dark mode** — toggle from the popover footer
 - **Launch at login** — optional, off by default; switch it on in the popover
+- **Command line** — control Hush from the terminal with `hush play`, `hush stop`, `hush volume 40`, and more (see [Command line](#command-line-mac))
 - **Remembers your settings** — last used noise type, volume, and appearance persist across launches
 
 ## Why I built this
@@ -48,6 +49,74 @@ See the [Privacy Policy](https://rahulprabha.github.io/Hush/privacy.html). For h
 Prefer GitHub? The same build is on the [Releases](../../releases) page, or build it yourself (see below).
 
 Requires macOS 13+. Apple notarized, so it just opens.
+
+## Command line (Mac)
+
+Hush ships a `hush` command that controls the running app, so the menu bar
+icon and your saved settings stay in sync. It starts Hush if it isn't running.
+
+```sh
+hush play                  # start playing (the last sound, or pass one)
+hush play speech-blocker   # switch sound and play
+hush stop
+hush toggle
+hush volume 40             # 0-100; `hush volume` alone prints the current volume
+hush status                # "Hush is playing Brown at 40% volume."
+hush status --json         # {"playing":true,"sound":"brown","volume":40}
+hush sounds                # list the available sounds
+hush --help
+```
+
+Exit codes: `0` success, `1` Hush couldn't carry out the command (for example,
+no audio output), `2` usage error, `3` Hush couldn't be launched or didn't
+answer within 10 seconds.
+
+### Putting `hush` on your PATH
+
+The command is the app's own executable, so there is nothing extra to install:
+link it from a folder on your `PATH`. The app has to stay where you link it
+from (`/Applications` is the usual place).
+
+```sh
+# Intel Mac, or any Mac where /usr/local/bin is on your PATH
+sudo mkdir -p /usr/local/bin
+sudo ln -s /Applications/Hush.app/Contents/MacOS/Hush /usr/local/bin/hush
+
+# Apple Silicon with Homebrew
+ln -s /Applications/Hush.app/Contents/MacOS/Hush /opt/homebrew/bin/hush
+
+# No admin rights: link into ~/.local/bin and add it to your PATH
+mkdir -p ~/.local/bin
+ln -s /Applications/Hush.app/Contents/MacOS/Hush ~/.local/bin/hush
+```
+
+Or skip the link and use an alias in your shell profile:
+
+```sh
+alias hush='/Applications/Hush.app/Contents/MacOS/Hush --cli'
+```
+
+The link must be named `hush` (lowercase); that name is how the executable
+knows to behave as the command. Launching Hush from Finder or `open` is
+unaffected.
+
+### How it works
+
+The command sends your request to the app as a `hush://` URL, which the app
+handles, then prints the answer the app leaves for it. It never plays audio
+itself. This needs no extra entitlement, so it works in the sandboxed Mac App
+Store build. The same URLs work from anywhere that can open a URL (Shortcuts'
+"Open URLs", Raycast, Alfred, `open`):
+
+| URL | Action |
+|---|---|
+| `hush://play` · `hush://play?sound=speech-blocker` | Play, optionally switching sound |
+| `hush://stop` · `hush://toggle` | Stop · toggle |
+| `hush://volume?level=40` | Set the volume (0-100) |
+| `hush://status` | Report state (only useful to the `hush` command) |
+
+Any app or web page can open a `hush://` URL, so they can start, stop, or
+change the volume of Hush. They can't read anything or do anything else.
 
 ## Building from source
 
