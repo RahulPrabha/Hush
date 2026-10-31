@@ -27,73 +27,71 @@ final class RemoteCommandTests: XCTestCase {
         XCTAssertEqual(NoiseType.lookup("   "), .unknown)
     }
 
-    // MARK: URLs
+    // MARK: Command files
 
-    func testEveryCommandSurvivesAURLRoundTrip() throws {
+    private func decode(_ json: String) throws -> RemoteCommand {
+        try JSONDecoder().decode(RemoteCommand.self, from: Data(json.utf8))
+    }
+
+    func testEveryCommandSurvivesAnEncodeDecodeRoundTrip() throws {
         let commands: [RemoteCommand] = [
             .play(nil), .play(.brown), .play(.speechBlocker),
             .stop, .toggle, .status,
             .setVolume(0), .setVolume(37), .setVolume(100),
         ]
         for command in commands {
-            XCTAssertEqual(try RemoteCommand(url: command.url()), command, "\(command)")
-            XCTAssertEqual(try RemoteCommand(url: command.url(replyToken: "ABCD-1234")), command, "\(command)")
+            let data = try JSONEncoder().encode(command)
+            XCTAssertEqual(try JSONDecoder().decode(RemoteCommand.self, from: data), command, "\(command)")
         }
     }
 
-    func testURLShapes() {
-        XCTAssertEqual(RemoteCommand.stop.url().absoluteString, "hush://stop")
-        XCTAssertEqual(RemoteCommand.play(.speechBlocker).url().absoluteString, "hush://play?sound=speech-blocker")
-        XCTAssertEqual(RemoteCommand.setVolume(40).url().absoluteString, "hush://volume?level=40")
-        XCTAssertEqual(
-            RemoteCommand.status.url(replyToken: "ABCD-1234").absoluteString,
-            "hush://status?reply=ABCD-1234"
-        )
-    }
-
-    func testParsesHandWrittenURLs() throws {
-        XCTAssertEqual(try RemoteCommand(url: URL(string: "hush://play")!), .play(nil))
-        XCTAssertEqual(try RemoteCommand(url: URL(string: "HUSH://Toggle")!), .toggle)
-        XCTAssertEqual(try RemoteCommand(url: URL(string: "hush:stop")!), .stop)
-        XCTAssertEqual(try RemoteCommand(url: URL(string: "hush:///status")!), .status)
-        XCTAssertEqual(try RemoteCommand(url: URL(string: "hush://play?sound=Speech%20Blocker")!), .play(.speechBlocker))
-        XCTAssertEqual(try RemoteCommand(url: URL(string: "hush://play?sound=speech")!), .play(.speechBlocker))
-    }
-
-    func testRejectsWrongScheme() {
-        XCTAssertThrowsError(try RemoteCommand(url: URL(string: "https://play")!)) {
-            XCTAssertEqual($0 as? RemoteCommandError, .notAHushURL)
-        }
-        XCTAssertFalse(RemoteCommand.handles(URL(string: "https://hush")!))
-        XCTAssertTrue(RemoteCommand.handles(URL(string: "hush://stop")!))
+    func testDecodesHandWrittenCommands() throws {
+        XCTAssertEqual(try decode(#"{"command":"play"}"#), .play(nil))
+        XCTAssertEqual(try decode(#"{"command":"play","sound":"speech"}"#), .play(.speechBlocker))
+        XCTAssertEqual(try decode(#"{"command":"play","sound":"Speech Blocker"}"#), .play(.speechBlocker))
+        XCTAssertEqual(try decode(#"{"command":"stop"}"#), .stop)
+        XCTAssertEqual(try decode(#"{"command":"toggle"}"#), .toggle)
+        XCTAssertEqual(try decode(#"{"command":"status"}"#), .status)
+        XCTAssertEqual(try decode(#"{"command":"volume","level":40}"#), .setVolume(40))
     }
 
     func testRejectsUnknownCommand() {
-        XCTAssertThrowsError(try RemoteCommand(url: URL(string: "hush://explode")!)) {
+        XCTAssertThrowsError(try decode(#"{"command":"explode"}"#)) {
             XCTAssertEqual($0 as? RemoteCommandError, .unknownCommand("explode"))
         }
+        // Command names are exact: the CLI lowercases before it writes one.
+        XCTAssertThrowsError(try decode(#"{"command":"STOP"}"#))
     }
 
     func testRejectsUnknownSound() {
-        XCTAssertThrowsError(try RemoteCommand(url: URL(string: "hush://play?sound=white")!)) {
+        XCTAssertThrowsError(try decode(#"{"command":"play","sound":"white"}"#)) {
             XCTAssertEqual($0 as? RemoteCommandError, .unknownSound("white"))
         }
     }
 
     func testRejectsBadVolumes() {
-        for bad in ["hush://volume", "hush://volume?level=", "hush://volume?level=abc",
-                    "hush://volume?level=101", "hush://volume?level=-1", "hush://volume?level=4.5"] {
-            XCTAssertThrowsError(try RemoteCommand(url: URL(string: bad)!), bad) {
+        for bad in [#"{"command":"volume"}"#,
+                    #"{"command":"volume","level":101}"#,
+                    #"{"command":"volume","level":-1}"#] {
+            XCTAssertThrowsError(try decode(bad), bad) {
                 guard case .invalidVolume = $0 as? RemoteCommandError else {
                     return XCTFail("\(bad): unexpected error \($0)")
                 }
             }
         }
+        XCTAssertThrowsError(try decode(#"{"command":"volume","level":4.5}"#))
+        XCTAssertThrowsError(try decode(#"{"command":"volume","level":"loud"}"#))
+    }
+
+    func testRejectsMalformedFiles() {
+        XCTAssertThrowsError(try decode("not json"))
+        XCTAssertThrowsError(try decode("{}"))
+        XCTAssertThrowsError(try decode("[]"))
     }
 
     func testErrorMessagesNameTheProblem() {
         XCTAssertTrue(RemoteCommandError.unknownSound("white").localizedDescription.contains("brown, speech-blocker"))
-        XCTAssertTrue(RemoteCommandError.invalidVolume("abc").localizedDescription.contains("0 to 100"))
+        XCTAssertTrue(RemoteCommandError.invalidVolume(500).localizedDescription.contains("0 to 100"))
     }
 
     // MARK: Responses

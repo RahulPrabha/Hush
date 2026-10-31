@@ -102,21 +102,16 @@ unaffected.
 
 ### How it works
 
-The command sends your request to the app as a `hush://` URL, which the app
-handles, then prints the answer the app leaves for it. It never plays audio
-itself. This needs no extra entitlement, so it works in the sandboxed Mac App
-Store build. The same URLs work from anywhere that can open a URL (Shortcuts'
-"Open URLs", Raycast, Alfred, `open`):
+The `hush` command never plays audio itself. It writes your request as a small
+file into Hush's own sandbox container, starts Hush if it isn't running, and
+prints the answer Hush leaves in the same place. Hush watches that folder and
+ignores everything else.
 
-| URL | Action |
-|---|---|
-| `hush://play` · `hush://play?sound=speech-blocker` | Play, optionally switching sound |
-| `hush://stop` · `hush://toggle` | Stop · toggle |
-| `hush://volume?level=40` | Set the volume (0-100) |
-| `hush://status` | Report state (only useful to the `hush` command) |
-
-Any app or web page can open a `hush://` URL, so they can start, stop, or
-change the volume of Hush. They can't read anything or do anything else.
+That folder lives inside Hush's App Sandbox container, so a web page or another
+sandboxed app can't send Hush a command: there is no URL scheme and no network
+listener for a browser to reach. (Only a program running as you outside the
+sandbox could write there, and it could already do anything you can.) It needs
+no extra entitlement, so it works in the sandboxed Mac App Store build.
 
 ## Building from source
 

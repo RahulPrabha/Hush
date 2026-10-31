@@ -2,21 +2,18 @@ import AppKit
 
 extension AudioEngine: PlaybackControlling {}
 
+/// Kept for the life of the app; `AppDelegate` itself is declared in HushApp.swift.
+private var remoteControlServer: RemoteControlServer?
+
 extension AppDelegate {
-    /// AppKit delivers the `hush://` URL that launched the app after this
-    /// call and before `applicationDidFinishLaunching`, so this is where the
-    /// saved sound and volume have to be applied for that first command to
-    /// see them. (The popover only applies them when it first appears.)
+    /// Applies the saved sound and volume (the popover only does that when it
+    /// first appears), then starts listening for commands from the `hush`
+    /// tool. A command that launched the app is already waiting on disk, so it
+    /// runs here, after the saved settings and before the first window.
     func applicationWillFinishLaunching(_ notification: Notification) {
         HushSettings.restore(into: audioEngine)
-    }
-
-    /// `hush://` URLs: from the `hush` command line tool, or from anything
-    /// else that opens one (Shortcuts, Raycast, a Stream Deck button).
-    func application(_ application: NSApplication, open urls: [URL]) {
-        let handler = RemoteControlHandler(engine: audioEngine)
-        for url in urls where RemoteCommand.handles(url) {
-            handler.handle(url: url)
-        }
+        let server = RemoteControlServer(engine: audioEngine)
+        remoteControlServer = server
+        server.start()
     }
 }

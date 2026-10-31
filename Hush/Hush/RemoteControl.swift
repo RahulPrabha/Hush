@@ -1,7 +1,8 @@
 import Foundation
 
-// App side of the command line interface: applies a `RemoteCommand` to the
-// audio engine and leaves the answer where the `hush` tool can pick it up.
+// App side of the command line interface: finds the commands the `hush` tool
+// left for it, applies them to the audio engine, and leaves the answers where
+// the tool can pick them up.
 
 /// The slice of `AudioEngine` the remote control needs, so tests can drive the
 /// handler with a fake instead of real audio output.
@@ -40,16 +41,27 @@ enum HushSettings {
     }
 }
 
-/// Where the app leaves its answer to a command. The CLI and the app run the
-/// same sandboxed executable, so both see the same container and the answer
-/// travels as a plain file; no entitlement is involved.
-struct ReplyMailbox {
+/// How the `hush` tool and the running app talk: two folders of small JSON
+/// files, named by a random token. The tool drops `commands/<token>.json`; the
+/// app applies it and leaves `replies/<token>.json`.
+///
+/// The tool is the app's own sandboxed executable, so both ends share one app
+/// container and nothing else can write there: no other app, and no web page,
+/// can send Hush a command. There is no URL scheme and no entitlement.
+struct CommandChannel {
     let directory: URL
 
-    static let live: ReplyMailbox = {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        return ReplyMailbox(directory: caches.appendingPathComponent("hush-cli", isDirectory: true))
+    /// Commands older than this are dropped unread, so one the tool gave up on
+    /// (or that outlived a hung app) can't run late.
+    static let commandLifetime: TimeInterval = 30
+
+    static let live: CommandChannel = {
+        let tmp = FileManager.default.temporaryDirectory
+        return CommandChannel(directory: tmp.appendingPathComponent("hush-cli", isDirectory: true))
     }()
+
+    var commandsDirectory: URL { directory.appendingPathComponent("commands", isDirectory: true) }
+    var repliesDirectory: URL { directory.appendingPathComponent("replies", isDirectory: true) }
 
     static func makeToken() -> String {
         UUID().uuidString
@@ -66,40 +78,90 @@ struct ReplyMailbox {
         }
     }
 
-    static func token(in url: URL) -> String? {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let value = components.queryItems?.first(where: { $0.name == RemoteCommand.replyQueryName })?.value,
-              isValid(token: value) else { return nil }
-        return value
+    private func commandFile(_ token: String) -> URL {
+        commandsDirectory.appendingPathComponent("\(token).json")
     }
 
-    private func file(for token: String) -> URL {
-        directory.appendingPathComponent("\(token).json")
+    private func replyFile(_ token: String) -> URL {
+        repliesDirectory.appendingPathComponent("\(token).json")
     }
 
-    func write(_ response: RemoteResponse, token: String) throws {
+    private func createDirectories() throws {
+        let fm = FileManager.default
+        try fm.createDirectory(at: commandsDirectory, withIntermediateDirectories: true)
+        try fm.createDirectory(at: repliesDirectory, withIntermediateDirectories: true)
+    }
+
+    // MARK: Tool side
+
+    func submit(_ command: RemoteCommand, token: String) throws {
         guard Self.isValid(token: token) else { return }
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        // Atomic, so the reader never sees half a file.
-        try JSONEncoder().encode(response).write(to: file(for: token), options: .atomic)
+        try createDirectories()
+        // Atomic, so the app never reads half a file.
+        try JSONEncoder().encode(command).write(to: commandFile(token), options: .atomic)
+    }
+
+    /// Takes back a command the app hasn't picked up yet. False if it already has.
+    @discardableResult
+    func withdraw(token: String) -> Bool {
+        guard Self.isValid(token: token) else { return false }
+        return (try? FileManager.default.removeItem(at: commandFile(token))) != nil
     }
 
     /// Returns the answer for `token` and removes it, or nil if it hasn't
     /// arrived (or can't be read).
-    func take(token: String) -> RemoteResponse? {
+    func takeReply(token: String) -> RemoteResponse? {
         guard Self.isValid(token: token) else { return nil }
-        let url = file(for: token)
+        let url = replyFile(token)
         guard let data = try? Data(contentsOf: url),
               let response = try? JSONDecoder().decode(RemoteResponse.self, from: data) else { return nil }
         try? FileManager.default.removeItem(at: url)
         return response
     }
 
-    /// Drops answers nobody collected (the CLI gave up or was interrupted).
-    func removeStale(olderThan age: TimeInterval = 60, now: Date = Date()) {
+    // MARK: App side
+
+    struct PendingCommand {
+        var token: String
+        var command: Result<RemoteCommand, Error>
+    }
+
+    /// Collects and removes every waiting command, oldest first. Files with an
+    /// unusable name, and commands past their lifetime, are discarded.
+    func takePendingCommands(now: Date = Date()) -> [PendingCommand] {
         let fm = FileManager.default
         guard let files = try? fm.contentsOfDirectory(
-            at: directory,
+            at: commandsDirectory,
+            includingPropertiesForKeys: [.contentModificationDateKey]
+        ) else { return [] }
+
+        var pending: [(modified: Date, entry: PendingCommand)] = []
+        for file in files where file.pathExtension == "json" {
+            let token = file.deletingPathExtension().lastPathComponent
+            let modified = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?
+                .contentModificationDate ?? now
+            let data = try? Data(contentsOf: file)
+            try? fm.removeItem(at: file)
+            guard Self.isValid(token: token),
+                  now.timeIntervalSince(modified) <= Self.commandLifetime,
+                  let data else { continue }
+            let command = Result { try JSONDecoder().decode(RemoteCommand.self, from: data) }
+            pending.append((modified, PendingCommand(token: token, command: command)))
+        }
+        return pending.sorted { $0.modified < $1.modified }.map(\.entry)
+    }
+
+    func writeReply(_ response: RemoteResponse, token: String) throws {
+        guard Self.isValid(token: token) else { return }
+        try createDirectories()
+        try JSONEncoder().encode(response).write(to: replyFile(token), options: .atomic)
+    }
+
+    /// Drops answers nobody collected (the tool gave up or was interrupted).
+    func removeStaleReplies(olderThan age: TimeInterval = 60, now: Date = Date()) {
+        let fm = FileManager.default
+        guard let files = try? fm.contentsOfDirectory(
+            at: repliesDirectory,
             includingPropertiesForKeys: [.contentModificationDateKey]
         ) else { return }
         for file in files where file.pathExtension == "json" {
@@ -112,27 +174,10 @@ struct ReplyMailbox {
     }
 }
 
+/// Applies commands to the audio engine.
 struct RemoteControlHandler {
     let engine: PlaybackControlling
     var defaults: UserDefaults = .standard
-    var mailbox: ReplyMailbox = .live
-
-    /// Handles one `hush://` URL and, if it carries a reply token, leaves the
-    /// answer in the mailbox. Returns the answer for callers that want it.
-    @discardableResult
-    func handle(url: URL) -> RemoteResponse {
-        let response: RemoteResponse
-        do {
-            response = perform(try RemoteCommand(url: url))
-        } catch {
-            response = .failure(error.localizedDescription, state: snapshot())
-        }
-        if let token = ReplyMailbox.token(in: url) {
-            mailbox.removeStale()
-            try? mailbox.write(response, token: token)
-        }
-        return response
-    }
 
     func perform(_ command: RemoteCommand) -> RemoteResponse {
         switch command {
@@ -176,5 +221,78 @@ struct RemoteControlHandler {
             sound: engine.noiseType.cliID,
             volume: Int((engine.volume * 100).rounded())
         )
+    }
+}
+
+/// Watches the commands folder and runs whatever the `hush` tool leaves in it.
+/// Everything happens on `queue` (the main queue in the app), where the audio
+/// engine lives.
+final class RemoteControlServer {
+    private let handler: RemoteControlHandler
+    private let channel: CommandChannel
+    private let queue: DispatchQueue
+    private var source: DispatchSourceFileSystemObject?
+
+    init(
+        engine: PlaybackControlling,
+        channel: CommandChannel = .live,
+        defaults: UserDefaults = .standard,
+        queue: DispatchQueue = .main
+    ) {
+        self.handler = RemoteControlHandler(engine: engine, defaults: defaults)
+        self.channel = channel
+        self.queue = queue
+    }
+
+    deinit {
+        source?.cancel()
+    }
+
+    /// Starts watching, then runs anything already waiting (a command that
+    /// launched the app is on disk before the app is up). Call on `queue`.
+    func start() {
+        arm()
+        drain()
+    }
+
+    /// Runs every waiting command and writes its reply. Call on `queue`.
+    func drain() {
+        channel.removeStaleReplies()
+        for pending in channel.takePendingCommands() {
+            let response: RemoteResponse
+            switch pending.command {
+            case .success(let command):
+                response = handler.perform(command)
+            case .failure(let error):
+                response = .failure(error.localizedDescription)
+            }
+            try? channel.writeReply(response, token: pending.token)
+        }
+    }
+
+    /// Opens the commands folder for events. If the folder is removed or
+    /// replaced (the system can clear temporary files), starts over.
+    private func arm() {
+        source?.cancel()
+        source = nil
+        try? FileManager.default.createDirectory(at: channel.commandsDirectory, withIntermediateDirectories: true)
+        let descriptor = open(channel.commandsDirectory.path, O_EVTONLY)
+        guard descriptor >= 0 else { return }
+
+        let source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: descriptor,
+            eventMask: [.write, .delete, .rename, .revoke],
+            queue: queue
+        )
+        source.setEventHandler { [weak self, weak source] in
+            guard let self, let source else { return }
+            if !source.data.isDisjoint(with: [.delete, .rename, .revoke]) {
+                self.arm()
+            }
+            self.drain()
+        }
+        source.setCancelHandler { close(descriptor) }
+        source.resume()
+        self.source = source
     }
 }
